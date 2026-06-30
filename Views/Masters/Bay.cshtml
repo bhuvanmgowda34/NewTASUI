@@ -1,0 +1,746 @@
+﻿@model List<NewTASUI.Models.BayTypeModel>
+
+<div class="bay-module-card">
+
+    <!-- TABS -->
+    <div class="bay-toggle">
+        <div class="bay-tab active">BAY</div>
+        <div class="bay-tab">BAY MATERIAL</div>
+        <div class="bay-indicator"></div>
+    </div>
+
+    <!-- BAY TAB -->
+    <div class="bay-content">
+
+        <!-- ADD FORM -->
+        <div class="bay-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Bay Name</label>
+                    <input type="text" id="addBayName" placeholder="Enter Bay Name" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Bay Type</label>
+                    <div class="custom-select" id="addBayTypeSelect">
+                        <div class="select-trigger"><span>Select Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown">
+                            @foreach (var bt in Model)
+                            {
+                                <div class="option" data-id="@bt.BayTypeId" data-name="@bt.BayTypeName">@bt.BayTypeName@(string.IsNullOrEmpty(bt.BayTypeDesc) ? "" : " — " + bt.BayTypeDesc)</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full">
+                <label>Description</label>
+                <input type="text" id="addBayDesc" placeholder="Enter Description" class="glass-input" />
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary"   onclick="saveBay()">Save</button>
+                <button class="btn-secondary" onclick="clearAddForm()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="bay-table">
+            <div class="table-header">
+                <div>Bay ID</div>
+                <div>Bay Name</div>
+                <div>Bay Type</div>
+                <div>Description</div>
+                <div>Status</div>
+            </div>
+            <div class="table-body" id="bayTableBody">
+                <div class="table-empty" id="bayTableEmpty">Loading...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BAY MATERIAL TAB -->
+    <div class="bay-material-container hidden">
+        <div class="bcu-prod-top">
+            <div class="form-group bcu-prod-selector">
+                <label>Bay</label>
+                <div class="custom-select material-top" id="materialBaySelect">
+                    <div class="select-trigger"><span>Select Bay</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="materialBayDropdown"></div>
+                </div>
+            </div>
+        </div>
+        <div class="bcu-prod-body">
+            <div class="material-box">
+                <div class="box-title">List of Available Products</div>
+                <div class="material-list" id="availableMaterials">
+                    <div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">Select a Bay to load products</div>
+                </div>
+            </div>
+            <div class="material-controls">
+                <button class="transfer-btn" type="button" disabled>&gt;</button>
+                <button class="transfer-btn" type="button" disabled>&lt;</button>
+            </div>
+            <div class="material-box">
+                <div class="box-title">List of Bay Associated Products</div>
+                <div class="material-list" id="associatedMaterials">
+                    <div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">Select a Bay to load products</div>
+                </div>
+            </div>
+        </div>
+        <div class="bay-table bcu-prod-table bay-material-table">
+            <div class="table-header">
+                <div>Product Name</div>
+                <div>BCU Name</div>
+                <div>Is Additive</div>
+                <div>Arm No</div>
+                <div>Recipe Number</div>
+            </div>
+            <div class="table-body" id="materialTableBody">
+                <div class="table-empty" id="materialTableEmpty">Select a Bay to view products.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════
+            MODAL — positioned inside .bay-module-card so it
+            is always bounded by the card regardless of whether
+            the alarm panel is open or closed.
+    ════════════════════════════════════════════════════════ -->
+    <div class="bm-backdrop" id="bmBackdrop" onclick="closeEditor()"></div>
+
+    <div class="bm-modal" id="bmModal">
+
+        <div class="bm-header">
+            <div class="bm-title"><span class="bm-icon">✎</span> Edit Bay</div>
+            <button class="bm-close" onclick="closeEditor()">✕</button>
+        </div>
+
+        <div class="bm-body">
+            <input type="hidden" id="editBayId" />
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Bay Name</label>
+                    <input type="text" id="editBayName" class="glass-input" readonly style="opacity:0.55;cursor:default;" />
+                </div>
+                <div class="form-group">
+                    <label>Bay Type</label>
+                    <div class="custom-select" id="editBayTypeSelect">
+                        <div class="select-trigger"><span>Select Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown">
+                            @foreach (var bt in Model)
+                            {
+                                <div class="option" data-id="@bt.BayTypeId" data-name="@bt.BayTypeName">@bt.BayTypeName@(string.IsNullOrEmpty(bt.BayTypeDesc) ? "" : " — " + bt.BayTypeDesc)</div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full">
+                <label>Description</label>
+                <input type="text" id="editBayDesc" class="glass-input" placeholder="Description" />
+            </div>
+
+            <div class="form-group">
+                <label>Status</label>
+                <div class="bm-status-toggle" id="statusToggle" onclick="toggleStatus()">
+                    <div class="bm-dot" id="statusDot"></div>
+                    <span id="statusLabel">Active</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bm-footer">
+            <div style="flex:1"></div>
+            <button class="btn-secondary" onclick="closeEditor()">Cancel</button>
+            <button class="btn-primary"   onclick="updateBay()">Update</button>
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+.bay-module-card { position: relative; }
+
+/* Backdrop */
+.bm-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+.bm-backdrop.show { opacity: 1; }
+
+/* Modal box */
+.bm-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -48%) scale(0.95);
+    width: min(520px, 88%);
+    background: linear-gradient(160deg,
+        rgba(42,42,42,0.99) 0%,
+        rgba(22,22,22,0.97) 100%);
+    border: 1px solid rgba(255,255,255,0.13);
+    border-radius: 14px;
+    box-shadow:
+        0 32px 80px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+    z-index: 1001;
+    opacity: 0;
+    transition: opacity 0.22s ease,
+                transform 0.22s cubic-bezier(.2,.8,.2,1);
+}
+.bm-modal.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Header */
+.bm-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+.bm-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    letter-spacing: 0.4px;
+}
+.bm-icon { color: #e10600; font-size: 15px; }
+.bm-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.35);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 3px 7px;
+    border-radius: 5px;
+    transition: color 0.15s, background 0.15s;
+    line-height: 1;
+}
+.bm-close:hover { color: #e10600; background: rgba(225,6,0,0.1); }
+
+/* Body */
+.bm-body {
+    padding: 20px 20px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Footer */
+.bm-footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 20px 18px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Status toggle */
+.bm-status-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    user-select: none;
+    color: rgba(255,255,255,0.85);
+    font-size: 12.5px;
+    transition: background 0.15s;
+    width: fit-content;
+}
+.bm-status-toggle:hover { background: rgba(255,255,255,0.08); }
+.bm-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #555;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+.bm-dot.active   { background: #00ff9c; box-shadow: 0 0 6px rgba(0,255,150,0.6); }
+.bm-dot.inactive { background: #ffd600; box-shadow: 0 0 6px rgba(255,214,0,0.5); }
+
+/* Delete btn */
+.btn-danger {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(225,6,0,0.38);
+    background: rgba(225,6,0,0.09);
+    color: #ff5555;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+    transition: background 0.15s, border-color 0.15s;
+}
+.btn-danger:hover  { background: rgba(225,6,0,0.2); border-color: #e10600; }
+.btn-danger:active { transform: scale(0.95); }
+
+/* Row states */
+.table-row { cursor: pointer; }
+.table-row.selected {
+    background: rgba(225,6,0,0.07);
+    border-left: 2px solid #e10600;
+}
+
+/* Empty */
+.table-empty {
+    padding: 32px;
+    text-align: center;
+    color: rgba(255,255,255,0.28);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+}
+
+    /* Bay Type dropdown field alignment fix  */
+
+    .bay-form .custom-select,
+    .bm-body .custom-select {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .bay-form .select-trigger,
+    .bm-body .select-trigger {
+        width: auto;
+        max-width: none;
+    }
+
+    .bay-form .select-dropdown,
+    .bm-body .select-dropdown {
+        box-sizing: border-box;
+        width: 100%;
+        left: 0;
+        right: auto;
+    }
+    /* ── Bay Type trigger height match fix ───────────────────── */
+
+    .bay-form .select-trigger,
+    .bm-body .select-trigger {
+        height: 32px;
+        min-height: 32px;
+        padding: 6px 10px;
+        box-sizing: content-box;
+        line-height: normal;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .bcu-prod-top {
+        margin-bottom: 1px;
+        display: flex;
+        gap: 14px;
+        overflow: visible !important;
+    }
+
+    .bcu-prod-top .bcu-prod-selector {
+        flex: 0 0 calc((100% - 42px) / 4);
+        max-width: calc((100% - 42px) / 4);
+        min-width: 0;
+    }
+
+    #materialBaySelect {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #materialBaySelect .select-trigger {
+        width: 100%;
+        height: 38px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.88);
+        font-size: 12px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .bcu-prod-body {
+        display: grid;
+        grid-template-columns: 1fr 60px 1fr;
+        gap: 16px;
+        margin-bottom: 26px;
+        flex-shrink: 0;
+        align-items: stretch;
+        min-height: 0;
+    }
+
+    .material-box {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .material-list {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        padding: 10px 12px;
+    }
+
+    .prod-item {
+        padding: 8px 12px;
+        border-radius: 8px;
+        color: rgba(255,255,255,0.85);
+        font-size: 12px;
+        cursor: default;
+        transition: background 0.15s ease;
+    }
+
+    .prod-item.prod-selected {
+        background: rgba(225,6,0,0.08);
+        border-left: 2px solid #e10600;
+    }
+
+    .transfer-btn[disabled] {
+        opacity: 0.45;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .bay-material-table .table-header,
+    .bay-material-table .table-row {
+        grid-template-columns: 1.2fr 1fr 110px 100px 140px;
+    }
+
+    .bay-material-table .table-row {
+        cursor: default;
+    }
+
+    .bay-material-table .table-row:hover {
+        background: rgba(255,255,255,0.02);
+    }
+
+</style>
+
+
+<script>
+
+    let allBays    = [];
+    let selectedId = null;
+    let editActive = true;
+    let addTypeId  = 0;
+    let allMaterials = [];
+    let bayMaterials = [];
+    let selectedMaterialBayId = 0;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        loadTable();
+        wireSelects();
+        wireMaterialBaySelect();
+    });
+
+    function loadTable() {
+    fetch('/Masters/GetBays', { cache: "no-store" })
+            .then(r => r.json())
+            .then(data => { allBays = data; renderTable(data); populateMaterialDrop(data); })
+            .catch(() => { document.getElementById("bayTableEmpty").textContent = "Failed to load."; });
+    }
+
+    function renderTable(bays) {
+        const body  = document.getElementById("bayTableBody");
+        const empty = document.getElementById("bayTableEmpty");
+
+        if (!body) return;   // safety
+
+        if (!bays || !bays.length) {
+            body.innerHTML = "";
+            if (empty) {
+                empty.style.display = "block";
+                empty.textContent = "No records found.";
+            }
+            return;
+        }
+
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = bays.map(b => `
+            <div class="table-row ${b.bayId === selectedId ? 'selected' : ''}"
+                    data-id="${b.bayId}" ondblclick="openEditor(${b.bayId})">
+                <div>${b.bayId}</div>
+                <div>${esc(b.bayName)}</div>
+                <div>${esc(b.bayType)}</div>
+                <div>${esc(b.bayDesc)}</div>
+                <div class="status ${b.isActive ? 'ok' : 'warn'}">
+                    ${b.isActive ? 'Active' : 'Inactive'}
+                </div>
+            </div>`).join("");
+    }
+
+    function openEditor(bayId) {
+        const bay = allBays.find(b => b.bayId === bayId);
+        if (!bay) return;
+        selectedId = bayId;
+
+        document.getElementById("editBayId").value   = bay.bayId;
+        document.getElementById("editBayName").value = bay.bayName;
+        document.getElementById("editBayDesc").value = bay.bayDesc;
+        setDrop("editBayTypeSelect", bay.bayTypeId, bay.bayType);
+        editActive = bay.isActive;
+        updateStatusUI();
+
+        document.querySelectorAll(".table-row").forEach(r => r.classList.remove("selected"));
+        document.querySelector(`.table-row[data-id="${bayId}"]`)?.classList.add("selected");
+
+        const modal = document.getElementById("bmModal");
+        const back  = document.getElementById("bmBackdrop");
+        modal.style.display = "block";
+        back.style.display  = "block";
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                modal.classList.add("show");
+                back.classList.add("show");
+            });
+        });
+    }
+
+    function closeEditor() {
+        const modal = document.getElementById("bmModal");
+        const back  = document.getElementById("bmBackdrop");
+        modal.classList.remove("show");
+        back.classList.remove("show");
+        setTimeout(() => { modal.style.display = "none"; back.style.display = "none"; }, 220);
+        document.querySelectorAll(".table-row").forEach(r => r.classList.remove("selected"));
+        selectedId = null;
+    }
+
+    function toggleStatus() {
+        editActive = !editActive;
+        updateStatusUI();
+    }
+
+    function updateStatusUI() {
+        document.getElementById("statusLabel").textContent = editActive ? "Active" : "Inactive";
+        const dot = document.getElementById("statusDot");
+        dot.className = "bm-dot " + (editActive ? "active" : "inactive");
+    }
+
+    function saveBay() {
+        const name = document.getElementById("addBayName").value.trim();
+        if (!name)      { alert("Bay Name required."); return; }
+        if (!addTypeId) { alert("Select a Bay Type.");  return; }
+        post('/Masters/SaveBay', {
+            bayId: null, bayName: name,
+            bayDesc: document.getElementById("addBayDesc").value.trim(),
+            bayTypeId: addTypeId, isActive: true
+        }).then(r => { if (r.success) { clearAddForm(); loadTable(); } else alert(r.message || "Save failed."); });
+    }
+
+    function updateBay() {
+        const typeId = getDrop("editBayTypeSelect");
+        if (!typeId) { alert("Select a Bay Type."); return; }
+        const bay = allBays.find(b => b.bayId === selectedId);
+        post('/Masters/SaveBay', {
+            bayId:     selectedId,
+            bayName:   bay ? bay.bayName : document.getElementById("editBayName").value.trim(),
+            bayDesc:   document.getElementById("editBayDesc").value.trim(),
+            bayTypeId: typeId,
+            isActive:  editActive
+        }).then(r => { if (r.success) { closeEditor(); loadTable(); } else alert(r.message || "Update failed."); });
+    }
+
+
+
+    function clearAddForm() {
+        document.getElementById("addBayName").value = "";
+        document.getElementById("addBayDesc").value = "";
+        addTypeId = 0;
+        const sp = document.querySelector("#addBayTypeSelect .select-trigger span");
+        if (sp) sp.textContent = "Select Type";
+    }
+
+    function populateMaterialDrop(bays) {
+        const dd = document.getElementById("materialBayDropdown");
+        if (!dd) return;
+        dd.innerHTML = bays.map(b => `<div class="option" data-id="${b.bayId}">${esc(b.bayName)}</div>`).join("");
+    }
+
+    function onMaterialBayChange(bayId) {
+        selectedMaterialBayId = bayId;
+
+        const availEl = document.getElementById("availableMaterials");
+        const assocEl = document.getElementById("associatedMaterials");
+        const body = document.getElementById("materialTableBody");
+        const empty = document.getElementById("materialTableEmpty");
+
+        if (availEl) availEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:12px">Loading...</div>';
+        if (assocEl) assocEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:12px">Loading...</div>';
+        if (body) body.innerHTML = "";
+        if (empty) { empty.style.display = "block"; empty.textContent = "Loading..."; }
+
+        Promise.all([
+            fetch("/Masters/GetAllProducts").then(r => r.json()),
+            fetch("/Masters/GetBayMaterials?bayId=" + bayId).then(r => r.json())
+        ])
+        .then(function(results) {
+            allMaterials = Array.isArray(results[0]) ? results[0] : [];
+            bayMaterials = Array.isArray(results[1]) ? results[1] : [];
+            renderAvailableMaterials();
+            renderAssociatedMaterials();
+            renderMaterialTable();
+        })
+        .catch(function() {
+            if (availEl) availEl.innerHTML = '<div style="color:#ff5555;font-size:12px;padding:12px">Failed to load materials</div>';
+            if (assocEl) assocEl.innerHTML = '<div style="color:#ff5555;font-size:12px;padding:12px">Failed to load materials</div>';
+            if (body) body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "Failed to load materials."; }
+        });
+    }
+
+    function renderAvailableMaterials() {
+        const el = document.getElementById("availableMaterials");
+        if (!el) return;
+
+        const assocIds = [...new Set(bayMaterials.map(m => m.productId))];
+        const available = allMaterials.filter(p => assocIds.indexOf(p.id) === -1);
+
+        if (!available.length) {
+            el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">No available products</div>';
+            return;
+        }
+
+        el.innerHTML = available.map(p => `<div class="prod-item">${esc(p.name)}</div>`).join("");
+    }
+
+    function renderAssociatedMaterials() {
+        const el = document.getElementById("associatedMaterials");
+        if (!el) return;
+
+        const grouped = [...new Map(bayMaterials.map(m => [m.productId, m])).values()];
+        if (!grouped.length) {
+            el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">No associated products</div>';
+            return;
+        }
+
+        el.innerHTML = grouped.map(p => `<div class="prod-item">${esc(p.productName)}</div>`).join("");
+    }
+
+    function renderMaterialTable() {
+        const body = document.getElementById("materialTableBody");
+        const empty = document.getElementById("materialTableEmpty");
+        if (!body) return;
+
+        if (!bayMaterials.length) {
+            body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "No products associated."; }
+            return;
+        }
+
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = bayMaterials.map(function(p) {
+            return '<div class="table-row">' +
+                '<div>' + esc(p.productName) + '</div>' +
+                '<div>' + esc(p.bcuName) + '</div>' +
+                '<div class="' + (p.isAdditive ? 'status ok' : 'status warn') + '">' + (p.isAdditive ? 'Yes' : 'No') + '</div>' +
+                '<div>' + esc(p.bcuArmNo) + '</div>' +
+                '<div>' + (p.bcuRecipeNo != null ? esc(p.bcuRecipeNo) : '&mdash;') + '</div>' +
+                '</div>';
+        }).join("");
+    }
+
+    function wireMaterialBaySelect() {
+        const dropdown = document.getElementById("materialBayDropdown");
+        const select = document.getElementById("materialBaySelect");
+        if (!dropdown || !select) return;
+
+        dropdown.addEventListener("click", function(e) {
+            const opt = e.target.closest(".option");
+            if (!opt) return;
+
+            e.stopPropagation();
+
+            const bayId = parseInt(opt.dataset.id) || 0;
+            const span = select.querySelector(".select-trigger span");
+            if (span) span.textContent = opt.textContent.trim();
+            select.setAttribute("data-selected-id", bayId ? String(bayId) : "");
+            select.classList.remove("open");
+
+            if (bayId) onMaterialBayChange(bayId);
+        });
+    }
+
+    function wireSelects() {
+        // Trigger clicks — open/close the dropdown
+        document.addEventListener("click", function (e) {
+            const trigger = e.target.closest(".select-trigger");
+            if (trigger) {
+                e.stopPropagation();
+                const sel = trigger.closest(".custom-select");
+                const isOpen = sel.classList.contains("open");
+                // Close all others
+                document.querySelectorAll(".custom-select.open").forEach(s => s.classList.remove("open"));
+                if (!isOpen) sel.classList.add("open");
+                return;
+            }
+
+            // Option clicks — select the value
+            const opt = e.target.closest(".option");
+            if (opt) {
+                e.stopPropagation();
+                const sel  = opt.closest(".custom-select");
+                const span = sel.querySelector(".select-trigger span");
+                span.textContent = opt.textContent;
+                sel.setAttribute("data-selected-id", opt.dataset.id || "");
+                sel.classList.remove("open");
+                // Track add-form type id
+                if (sel.id === "addBayTypeSelect") addTypeId = parseInt(opt.dataset.id) || 0;
+                return;
+            }
+
+            // Click outside — close all
+            document.querySelectorAll(".custom-select.open").forEach(s => s.classList.remove("open"));
+        });
+    }
+
+    function setDrop(id, valId, label) {
+        const sel = document.getElementById(id);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", valId || "");
+        const sp = sel.querySelector(".select-trigger span");
+        if (sp) sp.textContent = label || "Select Type";
+    }
+
+    function getDrop(id) {
+        return parseInt(document.getElementById(id)?.getAttribute("data-selected-id")) || 0;
+    }
+
+    function post(url, body) {
+        return fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) }).then(r => r.json());
+    }
+
+    function esc(s) {
+        if (!s) return "";
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+</script>

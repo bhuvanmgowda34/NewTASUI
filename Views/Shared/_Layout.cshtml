@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TAS Glass UI</title>
+    @*     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"> *@
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- Top Bar -->
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+                <img src="~/images/Trucklogo.png" class="topbar-logo" />
+            </div>
+
+            <div class="topbar-center">
+                <div class="ticker-wrapper">
+                    <div class="ticker-track" id="ticker">
+                        <span id="companyHeader">BPCL WARANGAL DEPOT - TELANGANA</span>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <span class="alarm-label">Alarm Panel</span>
+                <label class="neo-toggle">
+                    <input type="checkbox" id="alarmToggle">
+                    <span class="neo-slider"></span>
+                </label>
+            </div>
+
+        </header>
+
+        <!-- Alarm panel -->
+
+        <div id="alarmPanel" class="alarm-panel">
+
+            <div class="alarm-inner">
+
+                <!-- LEFT LOGO -->
+                <div class="alarm-logo left-logo">
+                    <img src="/images/Bharat-Petroleum.jpg" alt="BPCL Logo">
+                </div>
+
+                <!-- ALARM TABLE -->
+                <div class="alarm-table">
+
+                    <div class="alarm-header">
+                        <div>DateTime</div>
+                        <div>Source</div>
+                        <div>Alarm Description</div>
+                    </div>
+
+                </div>
+
+                <!-- STATUS -->
+                <div class="alarm-status">
+
+                    <div class="status-box status-center">
+                        <div class="status-title">License Status</div>
+                        <div class="status-value ok" id="licenseStatus">xxx</div>
+                    </div>
+
+                    <div class="status-box status-center">
+                        <div class="status-title">FAN Printing Mode</div>
+                        <div class="status-value ok">Auto</div>
+                    </div>
+
+                    <div class="status-box status-wide status-vertical">
+
+                        <div class="status-row">
+                            <span>Primary :- </span>
+                            <span class="status-value warn" id="primaryStatus">xxx</span>
+                        </div>
+
+                        <div class="status-row">
+                            <span>Secondary :- </span>
+                            <span class="status-value ok" id="secondaryStatus">xxx</span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RIGHT LOGO -->
+                <div class="alarm-logo right-logo">
+                    <img src="/images/ILM PRO 2.jpg" alt="ABB ILM Pro">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="app-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Fixed Header -->
+                <div class="sidebar-header-fixed">
+                    M E N U
+                </div>
+
+                <!-- Masters -->
+                <div class="sidebar-scroll">
+
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Masters <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <a href="/Masters/Bay" class="submenu-item">Bay</a>
+                            <a href="/Masters/Bcu" class="submenu-item">BCU</a>
+                            <a href="/Products" class="submenu-item">Product</a>
+                            <a href="/Trucks" class="submenu-item">Trucks</a>
+                            <a href="/Tanks" class="submenu-item">Tanks</a>
+                            <div class="submenu-item">Access Cards</div>
+                            <div class="submenu-item">Card Readers</div>
+                            <div class="submenu-item">Weigh Bridges</div>
+                            <div class="submenu-item">Registration Details</div>
+                            <div class="submenu-item">RFId Readers</div>
+                            <div class="submenu-item">Modbus Device</div>
+                            <div class="submenu-item">Queue Display Board</div>
+                        </div>
+                    </div>
+
+                    <!-- Work Flow -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Work Flow <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <a href="/SODEOD/SODEOD" class="submenu-item">SOD EOD</a>
+                            <a href="/Truck/Entry" class="submenu-item">Truck Entry</a>
+                            <a href="/TruckAttendance/Attendance" class="submenu-item">Attendance</a>
+                            <a href="/TruckRegistration/Registration" class="submenu-item">Registration</a>
+                            <a href="/TruckStatus/Status" class="submenu-item">Truck Status</a>
+                            <div class="submenu-item">FAN</div>
+                            <div class="submenu-item">Safety Check List</div>
+                            <div class="submenu-item">Empty Cylinder Counting</div>
+                            <div class="submenu-item">Packed Unloading</div>
+                            <div class="submenu-item">Packed Unloading Authorization</div>
+                            <div class="submenu-item">Packed Loading</div>
+                            <div class="submenu-item">Bay Entry</div>
+                            <div class="submenu-item">Bay Re-Allocation</div>
+                            <div class="submenu-item">Bay Console</div>
+                            <div class="submenu-item">SAP Posting Tank</div>
+                            <div class="submenu-item">LIC Area Truck Details</div>
+                            <div class="submenu-item">Own Use Registration</div>
+                            <div class="submenu-item">Staging Master</div>
+                            <div class="submenu-item">Own Use Authorize</div>
+                        </div>
+                    </div>
+
+                    <!-- Settings -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Settings <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Serial Comm</div>
+                            <div class="submenu-item">Communications</div>
+                            <div class="submenu-item">BCU Parameters-OPC tags</div>
+                            <div class="submenu-item">SAP Configurations</div>
+                            <div class="submenu-item">Tank OPC Params</div>
+                            <div class="submenu-item">BCU Configuration</div>
+                            <div class="submenu-item">BCU Batch Configuration</div>
+                            <div class="submenu-item">Truck Stages</div>
+                            <div class="submenu-item">BCU Acknowledge Message</div>
+                            <div class="submenu-item">BAY Parameters-OPC tags</div>
+                            <div class="submenu-item">Common Param Tags</div>
+                            <div class="submenu-item">Reasons</div>
+                        </div>
+                    </div>
+
+                    <!-- User Management -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            User Management <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Manage Users</div>
+                            <div class="submenu-item">Reset Password</div>
+                            <div class="submenu-item">User Rights Configuration</div>
+                        </div>
+                    </div>
+
+                    <!-- Others -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Others <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">SAP Parser</div>
+                            <div class="submenu-item">TT Bypass</div>
+                            <div class="submenu-item">Card Bypass</div>
+                            <div class="submenu-item">TT Regularize</div>
+                        </div>
+                    </div>
+
+                    <!-- LRC Reports -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            LRC Reports <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <a href="/Reports/BayWise" class="submenu-item">Bay Wise</a>
+                            <div class="submenu-item">Product wise summary report</div>
+                            <div class="submenu-item">Compartment Wise</div>
+                            <div class="submenu-item">Truck Cancel Report</div>
+                            <div class="submenu-item">K Factor detailed</div>
+                            <div class="submenu-item">K Factor Summary</div>
+                            <div class="submenu-item">Detailed Report for volume History</div>
+                            <div class="submenu-item">TT Loading Report History</div>
+                            <div class="submenu-item">Non Filling Card Detail</div>
+                            <div class="submenu-item">Equipment Downtime Report</div>
+                            <div class="submenu-item">Daily&Monthly Nano Report</div>
+                            <div class="submenu-item">Daily Tank Truck Loading</div>
+                            <div class="submenu-item">Locally Loaded Tank Lorries</div>
+                            <div class="submenu-item">Summary of Dispatches</div>
+                            <div class="submenu-item">Tank Daily Movement Register</div>
+                            <div class="submenu-item">TLF Report</div>
+                            <div class="submenu-item">Tank Truck Daily Movement</div>
+                            <div class="submenu-item">Lock Report</div>
+                            <div class="submenu-item">TT Hourly Filling Pattern</div>
+                            <div class="submenu-item">Avg TL inout Time</div>
+                            <div class="submenu-item">First Invoice Time</div>
+                            <div class="submenu-item">TL Loading Start Time</div>
+                            <div class="submenu-item">Avg Loading Time</div>
+                            <div class="submenu-item">Total Tank Lorries Loaded</div>
+                            <div class="submenu-item">Tank Lorry Desnity Report</div>
+                            <div class="submenu-item">Tank Lorry Unloading Report</div>
+                            <div class="submenu-item">Tank Lorry Manual Loaded Report</div>
+                            <div class="submenu-item">Tank Lorry Biometric Report</div>
+                            <div class="submenu-item">Own Use Report</div>
+                        </div>
+                    </div>
+
+                    <!-- DCS Reports -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            DCS Reports <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Product Pump Run Hour</div>
+                            <div class="submenu-item">JP Run Hour</div>
+                            <div class="submenu-item">FE Pump Run Hour</div>
+                            <div class="submenu-item">Product Pump Sequencing</div>
+                            <div class="submenu-item">JP/FE Pump Sequencing</div>
+                            <div class="submenu-item">Pump Fail to Start</div>
+                            <div class="submenu-item">UPS</div>
+                            <div class="submenu-item">HHH</div>
+                            <div class="submenu-item">Gantry Permissive Off</div>
+                            <div class="submenu-item">Equipment Maintenance</div>
+                            <div class="submenu-item">HCD</div>
+                            <div class="submenu-item">Fire Engine Testing</div>
+                            <div class="submenu-item">Proof Test VFT</div>
+                            <div class="submenu-item">MOS Current</div>
+                            <div class="submenu-item">MOS Summary</div>
+                            <div class="submenu-item">Proof Test Radar</div>
+                            <div class="submenu-item">Dyke Valve Report</div>
+                            <div class="submenu-item">ESD Cause & Effect Report</div>
+                            <div class="submenu-item">ESD</div>
+                        </div>
+                    </div>
+
+                    <!-- Home -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Home <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Log Out</div>
+                        </div>
+                    </div>
+
+                    <!-- Help -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Help <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">User Guide</div>
+                        </div>
+                    </div>
+
+                    <!-- DownTime -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            DownTime <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Equippment Logging Time</div>
+                        </div>
+                    </div>
+
+                    <!-- Scheduler -->
+                    <div class="menu-item has-children">
+                        <div class="menu-title">
+                            Scheduler <span class="arrow">›</span>
+                        </div>
+                        <div class="submenu">
+                            <div class="submenu-item">Scheduler Configuration</div>
+                            <div class="submenu-item">Maintenance Scheduler</div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="background-overlay"></div>
+                <div class="content-wrapper">
+                    @RenderBody()
+                </div>
+            </main>
+
+        </div>
+        <!-- NEW BOTTOM BAR -->
+        <footer class="bottombar">
+            © 2026 ABB Terminal Automation System
+        </footer>
+    </div>
+    <script src="~/js/site.js"></script>
+</body>
+</html>
+
+
+

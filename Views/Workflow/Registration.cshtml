@@ -1,0 +1,2165 @@
+﻿@{
+    ViewBag.Title = "Truck Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="bay-module-card">
+    <div class="bay-toggle">
+        <div class="bay-tab rg-tab-btn active" id="tabSearch" onclick="switchTab('search')">Search Trucks</div>
+        <div class="bay-tab rg-tab-btn" id="tabRegister" onclick="switchTab('register')">Register</div>
+        <div class="bay-indicator"></div>
+    </div>
+    <div class="bay-content">
+        <div class="te-grid">
+            <div class="te-panel">
+
+                <!-- ════════════════════════════════
+                     PANEL: SEARCH TRUCKS
+                ════════════════════════════════ -->
+                <div id="panelSearch" class="rg-panel">
+                    <div class="te-toolbar" style="margin-bottom:8px;">
+                        <div class="te-search-wrap">
+                            <label class="te-search-label">Truck Reg #</label>
+                            <input type="text" id="truckSearch" class="glass-input te-search"
+                                   placeholder="" oninput="filterSearchTable()" />
+                            <button class="btn-secondary te-find-btn" onclick="filterSearchTable()">Find</button>
+                            <button class="btn-secondary te-find-btn" onclick="loadSearchTable()">Refresh</button>
+                            <button class="btn-primary" id="btnRegister" onclick="onRegisterClick()">Register</button>
+                        </div>
+                        <div class="te-toolbar-note">
+                            Search the truck, select from the table and click Register &nbsp;&nbsp;
+                            Pending Trucks to Register:&nbsp;<span id="pendingCount" style="color:#e10600;font-weight:700;">0</span>
+                        </div>
+                    </div>
+
+                    <div class="te-subhead" style="margin-bottom:6px;">
+                        <div class="te-subhead-title">Today's Trucks to Register</div>
+                    </div>
+
+                    <!-- 21-col table mirrors VW_CURRENTATTENDANCE data -->
+                    <div class="bay-table rg-search-table" id="searchTrucksWrapper">
+                        <div class="table-header">
+                            <div>Sel</div>
+                            <div>Atten Date</div>
+                            <div>Time</div>
+                            <div>Atte. Type</div>
+                            <div>Truck No</div>
+                            <div>Truck Type</div>
+                            <div>Truck Key</div>
+                            <div>Is Perm</div>
+                            <div>Company Name</div>
+                            <div>No Of Comp</div>
+                            <div>Printed Tare</div>
+                            <div>Printed Gross</div>
+                            <div>Tanker Tare</div>
+                            <div>Tanker Gross</div>
+                            <div>CCOE Perm</div>
+                            <div>Calibration Due</div>
+                            <div>License Expiry</div>
+                            @* <div>TT Status</div>
+                            <div>Seq No</div>
+                            <div>Response</div>
+                            <div>Lic Info</div> *@
+                        </div>
+                        <div class="table-body" id="searchTruckBody">
+                            <div class="table-empty" id="searchTruckEmpty">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════════════════════════════════
+                     PANEL: REGISTER
+                ════════════════════════════════ -->
+                <div id="panelRegister" class="rg-panel" style="display:none;">
+
+                    <!-- Op Type bar -->
+                    <div class="rg-optype-bar">
+                        <span class="rg-optype-label">Operation Type</span>
+                        <label class="rg-radio-label">
+                            <input type="radio" name="opType" value="1" id="opLoading" checked onchange="onOpTypeChange()" />
+                            <span class="rg-radio-dot"></span>
+                            Loading
+                        </label>
+                        <label class="rg-radio-label">
+                            <input type="radio" name="opType" value="2" id="opUnloading" onchange="onOpTypeChange()" />
+                            <span class="rg-radio-dot"></span>
+                            Unloading
+                        </label>
+                        <div style="flex:1"></div>
+                        <button class="btn-primary" onclick="onSaveClick()">Save</button>
+                        <button class="btn-secondary" onclick="onClearRegister()">Clear</button>
+                    </div>
+
+                    <!-- Truck Details card -->
+                    <div class="rg-card">
+                        <div class="rg-card-title">Truck Details</div>
+                        <div class="rg-details-grid">
+                            <div class="rg-detail-row">
+                                <span class="rg-dl">Truck #</span>
+                                <span class="rg-dv" id="dtTruckNum">&mdash;</span>
+                                <span class="rg-dl">Num Of Compartments</span>
+                                <span class="rg-dv" id="dtNoOfComp">&mdash;</span>
+                                <span class="rg-dl">CCOE Permit Wt</span>
+                                <span class="rg-dv" id="dtCCOE">&mdash;</span>
+                            </div>
+                            <div class="rg-detail-row">
+                                <span class="rg-dl">Truck Type</span>
+                                <span class="rg-dv" id="dtTruckType">&mdash;</span>
+                                <span class="rg-dl">Printed Tare Wt</span>
+                                <span class="rg-dv" id="dtPrintedTare">&mdash;</span>
+                                <span class="rg-dl">Tanker Tare Wt</span>
+                                <span class="rg-dv" id="dtTankerTare">&mdash;</span>
+                            </div>
+                            <div class="rg-detail-row">
+                                <span class="rg-dl">Entered Date Time</span>
+                                <span class="rg-dv" id="dtEnteredDate">&mdash;</span>
+                                <span class="rg-dl">Printed Gross Wt</span>
+                                <span class="rg-dv" id="dtPrintedGross">&mdash;</span>
+                                <span class="rg-dl">Tanker Gross Wt</span>
+                                <span class="rg-dv" id="dtTankerGross">&mdash;</span>
+                            </div>
+                            <div class="rg-detail-row">
+                                <span class="rg-dl">Truck Key</span>
+                                <span class="rg-dv" id="dtTruckKey">&mdash;</span>
+                                <span class="rg-dl">Calibration Due Date</span>
+                                <span class="rg-dv" id="dtCalib">&mdash;</span>
+                                <span class="rg-dl">License Expiry Date</span>
+                                <span class="rg-dv" id="dtLicense">&mdash;</span>
+                            </div>
+                            <div class="rg-detail-row">
+                                <span class="rg-dl">Company Name</span>
+                                <span class="rg-dv" id="dtCompany">&mdash;</span>
+                                <span class="rg-dl"></span><span class="rg-dv"></span>
+                                <span class="rg-dl"></span><span class="rg-dv"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registration Details card -->
+                    <div class="rg-card">
+                        <div class="rg-card-title">Registration Details</div>
+                        <div class="rg-reg-row">
+                            <div class="rg-field-group">
+                                <label class="rg-field-label">Registration #</label>
+                                <input type="text" id="regNumber" class="rg-reg-input" readonly />
+                            </div>
+                            <div class="rg-field-group" style="min-width:200px;">
+                                <label class="rg-field-label">Oil Company <span class="req">*</span></label>
+                                <div class="rg-dd" id="oilCompanySelect">
+                                    <div class="rg-dd-trigger" onclick="toggleDd('oilCompanySelect')">
+                                        <span id="oilCompanyLabel">Select</span>
+                                        <span class="rg-caret">&#9660;</span>
+                                    </div>
+                                    <div class="rg-dd-list" id="oilCompanyDropdown">
+                                        <div class="option" data-disabled="1">Loading...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rg-field-group" style="min-width:170px;">
+                                <label class="rg-field-label">Plant Code</label>
+                                <div class="rg-dd" id="plantSelect">
+                                    <div class="rg-dd-trigger" onclick="toggleDd('plantSelect')">
+                                        <span id="plantLabel">Select</span>
+                                        <span class="rg-caret">&#9660;</span>
+                                    </div>
+                                    <div class="rg-dd-list" id="plantDropdown">
+                                        <div class="option" data-disabled="1">Loading...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="rg-field-group" style="min-width:150px;">
+                                <label class="rg-field-label">Plant Desc</label>
+                                <input type="text" id="plantDesc" class="rg-reg-input" readonly />
+                            </div>
+                            <div class="rg-field-group">
+                                <label class="rg-field-label">Registered By</label>
+                                <span style="font-size:13px;color:#6f8cff;font-weight:600;line-height:34px;">Administrator</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Loading card (visible for Loading op) -->
+                    <div class="rg-card" id="loadingSection">
+                        <div class="rg-bulk-tabstrip">
+                            <div class="rg-bulk-tab active">Bulk Loading</div>
+                        </div>
+
+                        <!-- Single / Multiple -->
+                        <div class="rg-mode-bar">
+                            <label class="rg-radio-label">
+                                <input type="radio" name="loadMode" value="single" id="modeS" checked onchange="onLoadModeChange()" />
+                                <span class="rg-radio-dot"></span>
+                                Single
+                            </label>
+                            <label class="rg-radio-label">
+                                <input type="radio" name="loadMode" value="multiple" id="modeM" onchange="onLoadModeChange()" />
+                                <span class="rg-radio-dot"></span>
+                                Multiple
+                            </label>
+                        </div>
+
+                        <!-- Single mode fields -->
+                        <div id="singleModeFields">
+                            <div class="rg-form-grid">
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Transporter Code</label>
+                                    <div class="rg-dd" id="transporterSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('transporterSelect')">
+                                            <span id="transporterLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="transporterDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Transporter Desc</label>
+                                    <input type="text" id="transporterDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Shipment No</label>
+                                    <input type="text" id="shipmentNo" class="rg-text-input" />
+                                </div>
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Destination Code</label>
+                                    <div class="rg-dd" id="destinationSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('destinationSelect')">
+                                            <span id="destinationLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="destinationDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Destination Desc</label>
+                                    <input type="text" id="destinationDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Customer Code</label>
+                                    <div class="rg-dd" id="customerSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('customerSelect')">
+                                            <span id="customerLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="customerDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Location Code</label>
+                                    <div class="rg-dd" id="locationSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('locationSelect')">
+                                            <span id="locationLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="locationDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Location Desc</label>
+                                    <input type="text" id="locationDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Customer Desc</label>
+                                    <input type="text" id="customerDesc" class="rg-text-input" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Multiple mode fields -->
+                        <div id="multipleModeFields" style="display:none;">
+                            <div class="rg-form-grid">
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Transporter Code</label>
+                                    <div class="rg-dd" id="mTransporterSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('mTransporterSelect')">
+                                            <span id="mTransporterLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="mTransporterDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Transporter Desc</label>
+                                    <input type="text" id="mTransporterDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Shipment No</label>
+                                    <input type="text" id="mShipmentNo" class="rg-text-input" />
+                                </div>
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Destination Code</label>
+                                    <div class="rg-dd" id="mDestinationSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('mDestinationSelect')">
+                                            <span id="mDestinationLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="mDestinationDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Destination Desc</label>
+                                    <input type="text" id="mDestinationDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Customer Code</label>
+                                    <div class="rg-dd" id="mCustomerSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('mCustomerSelect')">
+                                            <span id="mCustomerLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="mCustomerDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="rg-form-col">
+                                    <label class="rg-field-label">Location Code</label>
+                                    <div class="rg-dd" id="mLocationSelect">
+                                        <div class="rg-dd-trigger" onclick="toggleDd('mLocationSelect')">
+                                            <span id="mLocationLabel">Select</span>
+                                            <span class="rg-caret">&#9660;</span>
+                                        </div>
+                                        <div class="rg-dd-list" id="mLocationDropdown">
+                                            <div class="option" data-disabled="1">Loading...</div>
+                                        </div>
+                                    </div>
+                                    <label class="rg-field-label" style="margin-top:10px;">Location Desc</label>
+                                    <input type="text" id="mLocationDesc" class="rg-text-input" readonly />
+                                    <label class="rg-field-label" style="margin-top:10px;">Customer Desc</label>
+                                    <input type="text" id="mCustomerDesc" class="rg-text-input" readonly />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Loading Details subhead + table -->
+                        <div class="rg-loading-subhead">Loading Details</div>
+                        <div class="bay-table rg-loading-table" id="loadingTableWrapper">
+                            <div class="table-header" id="loadingTableHeader">
+                                <div>Compartment No</div>
+                                <div>Material Code</div>
+                                <div>Booked Quantity</div>
+                            </div>
+                            <div class="table-body" id="loadingTableBody">
+                                <div class="table-empty" id="loadingTableEmpty">Select a truck to populate compartment details.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Unloading placeholder -->
+                    <div class="rg-card" id="unloadingSection" style="display:none;">
+                        <div class="rg-card-title">Unloading</div>
+                        <div style="padding:30px;text-align:center;color:rgba(255,255,255,0.28);font-size:13px;">
+                            Unloading section — coming soon.
+                        </div>
+                    </div>
+
+                </div><!-- /panelRegister -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ MODAL: No Selection ══ -->
+<div class="bcum-backdrop" id="rgNoSelBackdrop"></div>
+<div class="bcum-modal te-modal" id="rgNoSelModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> Selection Required</div>
+        <button class="bcum-close" onclick="rgClose('rgNoSelModal','rgNoSelBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text">Please select a truck to perform this action.</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="rgClose('rgNoSelModal','rgNoSelBackdrop')">OK</button>
+    </div>
+</div>
+
+<!-- ══ MODAL: Manual Registration ══ -->
+<div class="bcum-backdrop" id="rgManualBackdrop"></div>
+<div class="bcum-modal te-modal" id="rgManualModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon">&#9998;</span> Manual Registration</div>
+        <button class="bcum-close" onclick="rgClose('rgManualModal','rgManualBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text" style="margin-bottom:6px;">Please select reason for Manual Registration</p>
+        <div class="form-group">
+            <label class="te-field-label">Reason <span class="req">*</span></label>
+            <div class="te-modal-select" id="regReasonSelect">
+                <div class="select-trigger" id="regReasonTrigger" onclick="toggleRegReasonSelect()">
+                    <span id="regReasonLabel">Select Reason</span>
+                </div>
+                <div class="select-dropdown" id="regReasonDropdown">
+                    <div class="option" data-disabled="1">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-secondary" onclick="rgClose('rgManualModal','rgManualBackdrop')">CLOSE</button>
+        <button class="btn-primary" id="btnDoRegister" onclick="onDoRegister()">Register</button>
+    </div>
+</div>
+
+<!-- ══ MODAL: SOD Warning ══ -->
+<div class="bcum-backdrop" id="rgSodBackdrop"></div>
+<div class="bcum-modal te-modal" id="rgSodModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> Attention Required</div>
+        <button class="bcum-close" onclick="rgClose('rgSodModal','rgSodBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text">Start of Day (SOD) not done. Cannot register truck.</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="rgClose('rgSodModal','rgSodBackdrop')">OK</button>
+    </div>
+</div>
+
+<!-- ══ MODAL: Success ══ -->
+<div class="bcum-backdrop" id="rgSuccessBackdrop"></div>
+<div class="bcum-modal te-modal" id="rgSuccessModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon" style="color:#6f8cff;">&#10003;</span> Registration Successful</div>
+        <button class="bcum-close" onclick="onSuccessOk()">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text" id="rgSuccessText">Truck Registered Successfully.</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="onSuccessOk()">OK</button>
+    </div>
+</div>
+
+<!-- ══ MODAL: Error / Info ══ -->
+<div class="bcum-backdrop" id="rgErrBackdrop"></div>
+<div class="bcum-modal te-modal" id="rgErrModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> Notice</div>
+        <button class="bcum-close" onclick="rgClose('rgErrModal','rgErrBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text" id="rgErrText"></p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="rgClose('rgErrModal','rgErrBackdrop')">OK</button>
+    </div>
+</div>
+
+
+<!-- ═══════════════════════════════
+     STYLES
+═══════════════════════════════ -->
+<style>
+    /* ── Layout ── */
+    .te-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        box-sizing: border-box;
+    }
+
+    .te-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .rg-panel {
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+    }
+
+    #panelSearch.rg-panel {
+        display: flex;
+    }
+
+    #panelRegister.rg-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 6px;
+    }
+
+    /* ── Tabs ── */
+    .bay-tab.rg-tab-btn {
+        cursor: pointer;
+    }
+
+    /* ── Toolbar ── */
+    .te-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: nowrap;
+    }
+
+    .te-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .te-search-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.82);
+        white-space: nowrap;
+    }
+
+    .te-search {
+        flex: 0 0 140px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12px;
+        box-sizing: border-box;
+        outline: none;
+    }
+
+        .te-search:focus {
+            border-color: rgba(225,6,0,0.5);
+            box-shadow: 0 0 0 2px rgba(225,6,0,0.1);
+        }
+
+    .te-find-btn {
+        height: 36px;
+        padding: 0 14px;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .te-toolbar-note {
+        flex: 1;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6f8cff;
+        white-space: nowrap;
+    }
+
+    .te-subhead {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        padding: 0 2px;
+    }
+
+    .te-subhead-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6f8cff;
+        white-space: nowrap;
+    }
+
+    /* ── Search table — 17 cols ── */
+    .rg-search-table .table-header,
+    .rg-search-table .table-row {
+        grid-template-columns: 44px 100px 84px 80px 126px 88px 88px 76px 130px 90px 100px 106px 100px 106px 96px 110px 110px;
+        font-size: 11px;
+    }
+
+    .rg-search-table {
+        flex: 1;
+        min-height: 160px;
+        height: auto;
+        max-height: none;
+        overflow-y: hidden;
+    }
+
+        .rg-search-table .table-body {
+            overflow-y: auto !important;
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+        }
+
+        .rg-search-table .table-header div,
+        .rg-search-table .table-row div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 6px;
+            box-sizing: border-box;
+            min-width: 0;
+        }
+
+        .rg-search-table .table-row {
+            cursor: pointer;
+        }
+
+            .rg-search-table .table-row:hover {
+                background: rgba(255,255,255,0.04);
+            }
+
+            .rg-search-table .table-row.te-selected {
+                background: rgba(225,6,0,0.07) !important;
+                border-left: 2px solid #e10600;
+            }
+
+    /* ── Bay table base ── */
+    .bay-table {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 0;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.02);
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+
+        .bay-table .table-header, .bay-table .table-body {
+            min-width: max-content;
+        }
+
+    .rg-loading-table .table-header,
+    .rg-loading-table .table-body {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .table-header {
+        display: grid;
+        align-items: center;
+        width: max-content;
+        position: relative;
+        z-index: 2;
+    }
+
+    .table-body {
+        display: block;
+        width: max-content;
+        overflow-y: auto;
+        overflow-x: hidden;
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .bay-table .table-header, .bay-table .table-row {
+        display: grid;
+        align-items: center;
+    }
+
+    /* ── Radio ── */
+    .te-row-check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+        .te-row-check input[type="radio"] {
+            display: none;
+        }
+
+    .te-radio-mark {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 1.4px solid rgba(255,255,255,0.28);
+        background: rgba(255,255,255,0.03);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s ease;
+        position: relative;
+        pointer-events: none;
+    }
+
+    .te-row-check input:checked + .te-radio-mark {
+        background: linear-gradient(180deg,#ff4d4d 0%,#cc0000 100%);
+        border-color: #e10600;
+        box-shadow: 0 0 4px rgba(225,6,0,0.45);
+    }
+
+    .te-radio-mark::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.18s ease;
+    }
+
+    .te-row-check input:checked + .te-radio-mark::after {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .te-radio-mark:hover {
+        border-color: rgba(255,255,255,0.45);
+        background: rgba(255,255,255,0.04);
+    }
+
+    /* ── Status badges ── */
+    .te-status-y {
+        color: #00ff9c;
+        font-size: 12px;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .te-status-n {
+        color: rgba(255,255,255,0.2);
+        font-size: 12px;
+    }
+
+    .te-lic-ok {
+        color: rgba(255,255,255,0.75);
+    }
+
+    .te-lic-warn {
+        color: #ffd600;
+    }
+
+    .te-lic-exp {
+        color: #ff5555;
+    }
+
+    .table-empty {
+        padding: 28px;
+        text-align: center;
+        color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    /* ── Op type bar ── */
+    .rg-optype-bar {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        padding: 10px 16px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 10px;
+    }
+
+    .rg-optype-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.75);
+        white-space: nowrap;
+    }
+
+    /* ── Custom radio dot ── */
+    .rg-radio-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 13px;
+        color: rgba(255,255,255,0.8);
+        user-select: none;
+    }
+
+        .rg-radio-label input[type="radio"] {
+            display: none;
+        }
+
+    .rg-radio-dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.04);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .rg-radio-label input:checked + .rg-radio-dot {
+        background: linear-gradient(180deg,#ff4d4d 0%,#cc0000 100%);
+        border-color: #e10600;
+        box-shadow: 0 0 6px rgba(225,6,0,0.4);
+    }
+
+    .rg-radio-dot::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        opacity: 0;
+        transform: scale(0.4);
+        transition: all 0.18s;
+    }
+
+    .rg-radio-label input:checked + .rg-radio-dot::after {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* ── Cards ── */
+    .rg-card {
+        background: rgba(255,255,255,0.02);
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 12px;
+        padding: 14px 18px;
+    }
+
+    .rg-card-title {
+        font-size: 10px;
+        font-weight: 700;
+        color: #6f8cff;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    /* ── Truck details grid ── */
+    .rg-details-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+    }
+
+    .rg-detail-row {
+        display: grid;
+        grid-template-columns: 150px 1fr 160px 1fr 150px 1fr;
+        align-items: baseline;
+        gap: 2px 8px;
+    }
+
+    .rg-dl {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.48);
+        text-align: right;
+        padding-right: 10px;
+        white-space: nowrap;
+    }
+
+    .rg-dv {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6f8cff;
+        white-space: nowrap;
+    }
+
+    /* ── Registration Details row ── */
+    .rg-reg-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 28px;
+        flex-wrap: wrap;
+    }
+
+    .rg-field-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .rg-field-label {
+        font-size: 11px;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 0.2px;
+    }
+
+    .rg-reg-input {
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #6f8cff;
+        font-size: 13px;
+        font-weight: 600;
+        box-sizing: border-box;
+        outline: none;
+        width: 120px;
+    }
+
+    .rg-text-input {
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.10);
+        background: rgba(255,255,255,0.03);
+        color: rgba(255,255,255,0.7);
+        font-size: 12px;
+        box-sizing: border-box;
+        outline: none;
+        width: 100%;
+    }
+
+    /* ── Bulk Loading tabstrip ── */
+    .rg-bulk-tabstrip {
+        display: flex;
+        margin-bottom: 14px;
+        border-bottom: 0;
+    }
+
+    .rg-bulk-tab {
+        font-size: 12px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.55);
+        padding: 6px 18px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.03);
+        cursor: default;
+    }
+
+        .rg-bulk-tab.active {
+            color: #e10600;
+            border-color: rgba(225,6,0,0.35);
+            border-bottom-color: rgba(225,6,0,0.35);
+            background: rgba(225,6,0,0.10);
+        }
+
+    /* ── Mode bar ── */
+    .rg-mode-bar {
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        margin-bottom: 14px;
+    }
+
+    /* ── Form grid ── */
+    .rg-form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 12px 20px;
+        margin-bottom: 4px;
+    }
+
+    .rg-form-col {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* ── Loading subhead ── */
+    .rg-loading-subhead {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6f8cff;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        margin: 16px 0 8px;
+    }
+
+    /* ── Loading table ── */
+    .rg-loading-table {
+        flex: 0 0 auto;
+        min-height: 0;
+        height: auto;
+        max-height: none;
+        overflow: visible !important;
+        border-radius: 10px;
+    }
+
+        .rg-loading-table .table-body {
+            width: 100% !important;
+            height: auto;
+            flex: 0 0 auto;
+            min-height: 0;
+            max-height: none;
+            overflow: visible !important;
+        }
+
+        .rg-loading-table .bay-table {
+            overflow: visible !important;
+        }
+
+        .rg-loading-table .table-header,
+        .rg-loading-table .table-row {
+            grid-template-columns: minmax(130px, 0.8fr) minmax(260px, 1.15fr) minmax(160px, 0.75fr);
+            font-size: 12px;
+            width: 100%;
+            min-width: 0;
+        }
+
+        .rg-loading-table .table-header {
+            min-height: 46px;
+            padding: 0;
+            z-index: 1;
+        }
+
+        .rg-loading-table.rg-loading-multiple .table-header,
+        .rg-loading-table.rg-loading-multiple .table-row {
+            grid-template-columns: minmax(120px, 0.75fr) minmax(250px, 1.15fr) minmax(150px, 0.75fr) minmax(130px, 0.72fr) minmax(160px, 0.85fr) minmax(130px, 0.72fr) minmax(160px, 0.85fr);
+        }
+
+            .rg-loading-table .table-header > div,
+            .rg-loading-table .table-row > div {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0 10px;
+                box-sizing: border-box;
+                min-width: 0;
+            }
+
+        .rg-loading-table .table-row {
+            cursor: default;
+            min-height: 52px;
+            padding: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        .rg-loading-table .table-row:has(.rg-prod-dd.open) {
+            z-index: 100000;
+        }
+
+            .rg-loading-table .table-row:hover {
+                background: rgba(255,255,255,0.025);
+            }
+
+    /* ── Product dropdown inside table ── */
+    .rg-prod-dd {
+        position: relative;
+        width: min(100%, 360px);
+        margin: 0 auto;
+        z-index: 5;
+    }
+
+        .rg-prod-dd.open {
+            z-index: 1000000;
+        }
+
+        .rg-prod-dd .rg-dd-trigger {
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 12px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+            .rg-prod-dd .rg-dd-trigger span:first-child {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+            }
+
+        .rg-prod-dd .rg-dd-list {
+            display: none;
+            position: absolute;
+            top: calc(100% + 3px);
+            bottom: auto;
+            left: 0;
+            width: max-content;
+            min-width: 100%;
+            max-width: 460px;
+            background: #080808 !important;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            z-index: 999999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+            max-height: 180px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.36) transparent;
+            isolation: isolate;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            mix-blend-mode: normal;
+            transform: translateZ(0);
+        }
+
+            .rg-prod-dd .rg-dd-list::before {
+                content: "";
+                position: absolute;
+                inset: 0;
+                z-index: -1;
+                background: #080808;
+                border-radius: 8px;
+            }
+
+        .rg-prod-dd.drop-up .rg-dd-list {
+            top: auto;
+            bottom: calc(100% + 3px);
+        }
+
+            .rg-prod-dd .rg-dd-list::-webkit-scrollbar,
+            .rg-dd-list::-webkit-scrollbar,
+            #panelRegister::-webkit-scrollbar {
+                width: 6px;
+                height: 6px;
+            }
+
+            .rg-prod-dd .rg-dd-list::-webkit-scrollbar-track,
+            .rg-dd-list::-webkit-scrollbar-track,
+            #panelRegister::-webkit-scrollbar-track {
+                background: transparent;
+                margin: 8px 2px;
+                border-radius: 10px;
+            }
+
+            .rg-prod-dd .rg-dd-list::-webkit-scrollbar-thumb,
+            .rg-dd-list::-webkit-scrollbar-thumb,
+            #panelRegister::-webkit-scrollbar-thumb {
+                background: linear-gradient(180deg, rgba(255,255,255,0.48), rgba(255,255,255,0.24));
+                border-radius: 10px;
+                border: 1px solid rgba(0,0,0,0.25);
+            }
+
+                .rg-prod-dd .rg-dd-list::-webkit-scrollbar-thumb:hover,
+                .rg-dd-list::-webkit-scrollbar-thumb:hover,
+                #panelRegister::-webkit-scrollbar-thumb:hover {
+                    background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,255,255,0.32));
+                }
+
+        .rg-prod-dd.open .rg-dd-list {
+            display: block !important;
+            background-color: #080808 !important;
+        }
+
+        .rg-prod-dd .rg-dd-list .option {
+            position: relative;
+            z-index: 1;
+            display: block !important;
+            padding: 8px 12px;
+            font-size: 12px;
+            line-height: 1.25;
+            background: #080808;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            text-align: left !important;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+            .rg-prod-dd .rg-dd-list .option:hover {
+                background: rgba(255,255,255,0.08);
+            }
+
+    .rg-qty-input {
+        height: 30px;
+        padding: 0 8px;
+        width: min(100%, 170px);
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12px;
+        box-sizing: border-box;
+        outline: none;
+        text-align: center;
+    }
+
+        .rg-qty-input[readonly] {
+            color: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.025);
+            cursor: default;
+        }
+
+    /* ── rg-dd (general form dropdowns) ── */
+    .rg-dd {
+        position: relative;
+        width: 100%;
+        overflow: visible !important;
+    }
+
+    .rg-dd-trigger {
+        height: 34px;
+        padding: 0 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .rg-dd-list {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 100%;
+        min-width: 160px;
+        background: rgba(18,18,18,0.99);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        z-index: 999999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .rg-dd.open .rg-dd-list {
+        display: block;
+    }
+
+    .rg-dd .rg-dd-list .option {
+        padding: 9px 14px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.85);
+        cursor: pointer;
+    }
+
+        .rg-dd .rg-dd-list .option:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+    .rg-caret {
+        font-size: 9px;
+        color: rgba(255,255,255,0.3);
+        margin-left: 6px;
+        flex-shrink: 0;
+    }
+
+    /* ── Scrollbars ── */
+    .bay-table::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+    }
+
+    .bay-table::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .bay-table::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg,rgba(255,255,255,0.25),rgba(255,255,255,0.08));
+        border-radius: 10px;
+    }
+
+    .bay-table::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+        position: relative;
+        padding: 8px 18px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(180deg,#ff4d4d 0%,#ff1f1f 40%,#cc0000 70%,#990000 100%);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4),0 0 8px rgba(255,0,0,0.25);
+        transition: all 0.15s ease;
+    }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95) translateY(1px);
+        }
+
+    .btn-secondary {
+        padding: 8px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: rgba(255,255,255,0.85);
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.35),inset 0 1px 0 rgba(255,255,255,0.1);
+        transition: all 0.15s ease;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+    /* ── Modals ── */
+    .bcum-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 99998;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+        .bcum-backdrop.show {
+            opacity: 1;
+        }
+
+    .bcum-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background: linear-gradient(160deg,rgba(42,42,42,0.99) 0%,rgba(22,22,22,0.97) 100%);
+        border: 1px solid rgba(255,255,255,0.13);
+        border-radius: 14px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.8),inset 0 1px 0 rgba(255,255,255,0.1);
+        z-index: 99999;
+        opacity: 0;
+        overflow: visible !important;
+        transition: opacity 0.22s ease,transform 0.22s cubic-bezier(.2,.8,.2,1);
+    }
+
+        .bcum-modal.show {
+            opacity: 1;
+            transform: translate(-50%,-50%) scale(1);
+        }
+
+    .bcum-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .bcum-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        letter-spacing: 0.4px;
+    }
+
+    .bcum-icon {
+        color: #e10600;
+        font-size: 15px;
+    }
+
+    .bcum-close {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.35);
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px 7px;
+        border-radius: 5px;
+        transition: color 0.15s,background 0.15s;
+        line-height: 1;
+    }
+
+        .bcum-close:hover {
+            color: #e10600;
+            background: rgba(225,6,0,0.1);
+        }
+
+    .bcum-body {
+        padding: 20px 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow: visible !important;
+    }
+
+    .bcum-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 20px 18px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .te-modal {
+        width: min(440px,92%) !important;
+    }
+
+    .te-modal-body {
+        padding: 22px 22px 10px !important;
+        gap: 14px !important;
+        overflow: visible !important;
+    }
+
+    .te-confirm-text {
+        font-size: 13px;
+        color: rgba(255,255,255,0.8);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .te-field-label {
+        font-size: 11px;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 6px;
+        line-height: 1;
+        letter-spacing: 0.2px;
+        display: block;
+    }
+
+    .te-warn-icon {
+        color: #ffd600 !important;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+
+    /* ── Modal dropdown (reuse attendance pattern) ── */
+    .te-modal-select {
+        position: relative;
+        width: 100%;
+        overflow: visible !important;
+    }
+
+        .te-modal-select .select-trigger {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .te-modal-select .select-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background: #080808 !important;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            z-index: 999999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+            max-height: 200px;
+            overflow-y: auto;
+            opacity: 1 !important;
+            visibility: visible !important;
+            pointer-events: auto !important;
+        }
+
+    .te-modal-select.open .select-dropdown {
+        display: block !important;
+    }
+
+    #regReasonSelect.open #regReasonDropdown {
+        display: block !important;
+        background: #080808 !important;
+        z-index: 1000000 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+    }
+
+        .te-modal-select .select-dropdown .option {
+            padding: 9px 14px;
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+        }
+
+            .te-modal-select .select-dropdown .option:hover {
+                background: rgba(255,255,255,0.08);
+            }
+</style>
+
+
+<!-- ═══════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════ -->
+<script>
+    /* ═══ STATE ═══ */
+    var currentTab       = "search";
+    var searchList       = [];
+    var selectedAttId    = null;   // TruckAttendanceId
+    var selectedTruckId  = null;
+    var selectedTruckNum = null;
+    var selectedAttRow   = null;   // full row object
+
+    var productsList     = [];
+    var oilCompList      = [];
+    var plantList        = [];
+    var transporterList  = [];
+    var destinationList  = [];
+    var locationList     = [];
+    var customerList     = [];
+    var regReasonList    = [];
+
+    var compartmentRows  = [];     // [{compartmentNo, productId, productLabel, quantity}]
+
+    /* ═══ INIT ═══ */
+    document.addEventListener("DOMContentLoaded", function () {
+        loadSearchTable();
+        loadDropdownData();
+        wireDropdowns();
+    });
+
+    /* ═══ TAB SWITCHING ═══ */
+    function switchTab(tab) {
+        currentTab = tab;
+        var ts = document.getElementById("tabSearch");
+        var tr = document.getElementById("tabRegister");
+        var ps = document.getElementById("panelSearch");
+        var pr = document.getElementById("panelRegister");
+        if (tab === "search") {
+            ts.classList.add("active");    tr.classList.remove("active");
+            ps.style.display = "flex";     pr.style.display = "none";
+            moveRgIndicator(ts);
+        } else {
+            ts.classList.remove("active"); tr.classList.add("active");
+    ps.style.display = "none";     pr.style.display = "flex";
+    pr.style.flexDirection = "column";
+                moveRgIndicator(tr);
+        }
+    }
+
+    function moveRgIndicator(tab) {
+        var indicator = document.querySelector(".bay-toggle .bay-indicator");
+        if (!tab || !indicator) return;
+        var rect = tab.getBoundingClientRect();
+        var parentRect = tab.parentElement.getBoundingClientRect();
+        indicator.style.width = rect.width + "px";
+        indicator.style.transform = "translateX(" + (rect.left - parentRect.left) + "px)";
+    }
+
+    /* ═══ SEARCH TABLE ═══ */
+    function loadSearchTable() {
+        setEmpty("searchTruckEmpty", "Loading...", true);
+        fetch("/TruckRegistration/GetPendingRegistration")
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                searchList = data || [];
+                document.getElementById("pendingCount").textContent = searchList.length;
+                renderSearchTable();
+            })
+            .catch(function () { setEmpty("searchTruckEmpty", "Failed to load", true); });
+    }
+
+    function filterSearchTable() { renderSearchTable(); }
+
+    function renderSearchTable() {
+        var body = document.getElementById("searchTruckBody");
+        var q    = (document.getElementById("truckSearch").value || "").trim().toLowerCase();
+        var list = q ? searchList.filter(function (t) {
+            return t.truckNumber && t.truckNumber.toLowerCase().indexOf(q) !== -1;
+        }) : searchList;
+
+        if (!list.length) { body.innerHTML = ""; setEmpty("searchTruckEmpty", "No pending registrations.", true); return; }
+        setEmpty("searchTruckEmpty", "", false);
+
+        body.innerHTML = list.map(function (t) {
+            var sel     = t.truckEntryId === selectedAttId ? " te-selected" : "";
+            var checked = sel ? "checked" : "";
+            // var statusStr = (!t.ttStatus || t.ttStatus === "N")
+            //     ? '<span class="te-status-n">&mdash; N</span>'
+            //     : '<span class="te-status-y">&#10004; Y</span>';
+
+            return '<div class="table-row' + sel + '" onclick="onSearchRowClick(' + t.truckEntryId + ',\'' + escJs(t.truckNumber) + '\',' + t.truckId + ')">' +
+                '<div class="te-row-check"><input type="radio" ' + checked + '/><div class="te-radio-mark"></div></div>' +
+                '<div>' + esc(t.entryDate)           + '</div>' +
+                '<div>' + esc(t.time)                + '</div>' +
+                '<div>' + esc(t.entryType)           + '</div>' +
+                '<div>' + esc(t.truckNumber)         + '</div>' +
+                '<div>' + esc(t.truckType)           + '</div>' +
+                '<div>' + escVal(t.truckKey)         + '</div>' +
+                '<div>' + (t.isPermanentKey ? '<span class="te-status-y">&#10004;</span>' : '&mdash;') + '</div>' +
+                '<div>' + esc(t.companyName)         + '</div>' +
+                '<div>' + escVal(t.noOfCompartments) + '</div>' +
+                '<div>' + fmtD(t.printedTareWeight)  + '</div>' +
+                '<div>' + fmtD(t.printedGrossWeight) + '</div>' +
+                '<div>' + fmtD(t.tankerTareWeight)   + '</div>' +
+                '<div>' + fmtD(t.tankerGrossWeight)  + '</div>' +
+                '<div>' + fmtD(t.ccoePermWeight)     + '</div>' +
+                '<div class="' + licClass(t.callibrationDueDate) + '">' + fmtDt(t.callibrationDueDate) + '</div>' +
+                '<div class="' + licClass(t.licenseExpireDate)   + '">' + fmtDt(t.licenseExpireDate)   + '</div>' +
+                // '<div>' + statusStr                  + '</div>' +
+                // '<div>' + escVal(t.sequenceNumber)   + '</div>' +
+                // '<div>' + esc(t.processingResponse)  + '</div>' +
+                // '<div>' + esc(t.licenseExpiryInfo)   + '</div>' +
+                '</div>';
+        }).join("");
+    }
+
+    function onSearchRowClick(id, regNum, truckId) {
+        if (selectedAttId === id) {
+            selectedAttId = null; selectedTruckNum = null; selectedTruckId = null; selectedAttRow = null;
+        } else {
+            selectedAttId = id; selectedTruckNum = regNum; selectedTruckId = truckId;
+            selectedAttRow = null;
+            for (var i = 0; i < searchList.length; i++) { if (searchList[i].truckEntryId === id) { selectedAttRow = searchList[i]; break; } }
+        }
+        renderSearchTable();
+    }
+
+    /* ═══ REGISTER CLICK ═══ */
+    function onRegisterClick() {
+        if (!selectedAttId) { rgOpen("rgNoSelModal", "rgNoSelBackdrop"); return; }
+        populateTruckDetails();
+        loadNextRegNumber();
+        switchTab("register");
+    }
+
+    function populateTruckDetails() {
+        var t = selectedAttRow;
+        if (!t) return;
+        setInner("dtTruckNum",     esc(t.truckNumber) || "&mdash;");
+        setInner("dtTruckType",    esc(t.truckType)   || "&mdash;");
+        setInner("dtEnteredDate",  esc((t.entryDate || "") + " " + (t.time || "")));
+        setInner("dtTruckKey",     escVal(t.truckKey));
+        setInner("dtCompany",      esc(t.companyName) || "&mdash;");
+        setInner("dtNoOfComp",     t.noOfCompartments != null ? String(t.noOfCompartments) : "&mdash;");
+        setInner("dtPrintedTare",  t.printedTareWeight  != null ? parseFloat(t.printedTareWeight).toFixed(2)  : "&mdash;");
+        setInner("dtPrintedGross", t.printedGrossWeight != null ? parseFloat(t.printedGrossWeight).toFixed(2) : "&mdash;");
+        setInner("dtCalib",        fmtDt(t.callibrationDueDate));
+        setInner("dtCCOE",         t.ccoePermWeight   != null ? parseFloat(t.ccoePermWeight).toFixed(2)   : "&mdash;");
+        setInner("dtTankerTare",   t.tankerTareWeight != null ? parseFloat(t.tankerTareWeight).toFixed(2) : "&mdash;");
+        setInner("dtTankerGross",  t.tankerGrossWeight!= null ? parseFloat(t.tankerGrossWeight).toFixed(2): "&mdash;");
+        setInner("dtLicense",      fmtDt(t.licenseExpireDate));
+
+        // Build compartment rows from truck master capacities when available.
+        var n = t.noOfCompartments || 1;
+        compartmentRows = [];
+        for (var i = 1; i <= n; i++) {
+            compartmentRows.push({ compartmentNo: i, productId: null, productLabel: "", quantity: 0 });
+        }
+        renderLoadingTable();
+        loadTruckCompartments();
+    }
+
+    function loadTruckCompartments() {
+        if (!selectedTruckId) return;
+        fetch("/TruckRegistration/GetTruckCompartments?truckId=" + encodeURIComponent(selectedTruckId))
+            .then(function (r) { return r.json(); })
+            .then(function (rows) {
+                if (!Array.isArray(rows) || !rows.length) return;
+                for (var i = 0; i < compartmentRows.length; i++) {
+                    for (var j = 0; j < rows.length; j++) {
+                        if (Number(rows[j].compartmentNo) === Number(compartmentRows[i].compartmentNo)) {
+                            compartmentRows[i].quantity = parseInt(rows[j].capacity, 10) || 0;
+                            break;
+                        }
+                    }
+                }
+                renderLoadingTable();
+            });
+    }
+
+    function setInner(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
+
+    /* ═══ NEXT REG NUMBER ═══ */
+    function loadNextRegNumber() {
+        fetch("/TruckRegistration/GetNextRegistrationNumber")
+            .then(function (r) { return r.json(); })
+            .then(function (d) { document.getElementById("regNumber").value = d.nextNumber || ""; });
+    }
+
+    /* ═══ OP TYPE / LOAD MODE ═══ */
+    function onOpTypeChange() {
+        var isUnload = document.getElementById("opUnloading").checked;
+        document.getElementById("loadingSection").style.display   = isUnload ? "none" : "";
+        document.getElementById("unloadingSection").style.display = isUnload ? ""     : "none";
+    }
+
+    function onLoadModeChange() {
+        var multi = document.getElementById("modeM").checked;
+        document.getElementById("singleModeFields").style.display   = multi ? "none" : "";
+        document.getElementById("multipleModeFields").style.display = multi ? ""     : "none";
+        renderLoadingTable();
+    }
+
+    /* ═══ LOADING TABLE ═══ */
+    function renderLoadingTable() {
+        var body = document.getElementById("loadingTableBody");
+        var header = document.getElementById("loadingTableHeader");
+        var wrapper = document.getElementById("loadingTableWrapper");
+        var multi = document.getElementById("modeM") && document.getElementById("modeM").checked;
+
+        if (wrapper) wrapper.classList.toggle("rg-loading-multiple", !!multi);
+        if (header) {
+            header.innerHTML = multi
+                ? '<div>Compartment No</div><div>Material Code</div><div>Booked Quantity</div><div>CustomerCode</div><div>CustomerDesc</div><div>DestinationCode</div><div>DestinationDesc</div>'
+                : '<div>Compartment No</div><div>Material Code</div><div>Booked Quantity</div>';
+        }
+
+        setEmpty("loadingTableEmpty", "", false);
+
+        if (!compartmentRows.length) {
+            body.innerHTML = "";
+            setEmpty("loadingTableEmpty", "No compartments.", true);
+            return;
+        }
+
+        var custCode  = multi ? (document.getElementById("mCustomerSelect").getAttribute("data-val") || "") : "";
+        var custDesc  = multi ? (document.getElementById("mCustomerDesc").value || "") : "";
+        var destCode  = multi ? (document.getElementById("mDestinationSelect").getAttribute("data-val") || "") : "";
+        var destDesc  = multi ? (document.getElementById("mDestinationDesc").value || "") : "";
+
+        body.innerHTML = compartmentRows.map(function (row, idx) {
+            var ddId  = "prodDd_"  + idx;
+            var lblId = "prodLbl_" + idx;
+            var qtyId = "qty_"     + idx;
+            var productCell =
+                '<div style="padding:5px 8px;">' +
+                  '<div class="rg-prod-dd" id="' + ddId + '">' +
+                    '<div class="rg-dd-trigger" onclick="toggleProdDd(\'' + ddId + '\')">' +
+                      '<span id="' + lblId + '">' + (row.productLabel || "Select Product") + '</span>' +
+                      '<span class="rg-caret">&#9660;</span>' +
+                    '</div>' +
+                    '<div class="rg-dd-list" id="' + ddId + '_list">' +
+                      buildProductOptions(idx, ddId, lblId) +
+                    '</div>' +
+                  '</div>' +
+                '</div>';
+            var qtyCell =
+                '<div style="padding:5px 8px;">' +
+                  '<input type="number" id="' + qtyId + '" class="rg-qty-input" min="0" value="' + row.quantity + '" readonly />' +
+                '</div>';
+
+            if (multi) {
+                return '<div class="table-row">' +
+                    '<div>' + row.compartmentNo + '</div>' +
+                    productCell +
+                    qtyCell +
+                    '<div>' + escVal(custCode) + '</div>' +
+                    '<div>' + escVal(custDesc) + '</div>' +
+                    '<div>' + escVal(destCode) + '</div>' +
+                    '<div>' + escVal(destDesc) + '</div>' +
+                '</div>';
+            }
+
+            return '<div class="table-row">' +
+                '<div>' + row.compartmentNo + '</div>' +
+                productCell +
+                qtyCell +
+                '</div>';
+        }).join("");
+    }
+
+    function buildProductOptions(rowIdx, ddId, lblId) {
+        if (!productsList.length) return '<div class="option" data-disabled="1">No products loaded</div>';
+        return productsList.map(function (p) {
+            var display = p.productCode + (p.productName ? ' - ' + p.productName : '');
+            return '<div class="option" title="' + escAttr(display) + '" onclick="selectProduct(' + rowIdx + ',' + p.productId + ',\'' + escJs(display) + '\',\'' + ddId + '\',\'' + lblId + '\')">' +
+                esc(display) + '</div>';
+        }).join("");
+    }
+
+    function toggleProdDd(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var wasOpen = el.classList.contains("open");
+        var all = document.querySelectorAll(".rg-prod-dd.open");
+        for (var i = 0; i < all.length; i++) {
+            all[i].classList.remove("open");
+            all[i].classList.remove("drop-up");
+        }
+        if (!wasOpen) {
+            var rect = el.getBoundingClientRect();
+            var panel = document.getElementById("panelRegister");
+            var panelRect = panel ? panel.getBoundingClientRect() : { bottom: window.innerHeight };
+            var spaceBelow = Math.min(window.innerHeight, panelRect.bottom) - rect.bottom;
+            var spaceAbove = rect.top - (panel ? panelRect.top : 0);
+            if (spaceBelow < 210 && spaceAbove > spaceBelow) el.classList.add("drop-up");
+            el.classList.add("open");
+        }
+    }
+
+    function selectProduct(rowIdx, productId, productLabel, ddId, lblId) {
+        compartmentRows[rowIdx].productId    = productId;
+        compartmentRows[rowIdx].productLabel = productLabel;
+        var lbl = document.getElementById(lblId);
+        if (lbl) lbl.textContent = productLabel;
+        var dd = document.getElementById(ddId);
+        if (dd) dd.classList.remove("open");
+    }
+
+    /* ═══ SAVE CLICK ═══ */
+    function onSaveClick() {
+        var oilCo = document.getElementById("oilCompanySelect").getAttribute("data-val");
+        if (!oilCo) { rgShowMsg("Please select Oil Company."); return; }
+
+        // Validate compartments
+        for (var i = 0; i < compartmentRows.length; i++) {
+            if (!compartmentRows[i].productId) {
+                rgShowMsg("Please select Material Code for Compartment " + compartmentRows[i].compartmentNo + "."); return;
+            }
+        }
+
+        // Load reasons if needed, then open modal
+        if (!regReasonList.length) {
+            loadRegReasons(function () { openManualModal(); });
+        } else {
+            openManualModal();
+        }
+    }
+
+    function openManualModal() {
+        document.getElementById("regReasonLabel").textContent = "Select Reason";
+        document.getElementById("regReasonSelect").removeAttribute("data-val");
+        renderRegReasons();
+        rgOpen("rgManualModal", "rgManualBackdrop");
+    }
+
+    function selectRegReason(val) {
+        document.getElementById("regReasonLabel").textContent = val;
+        document.getElementById("regReasonSelect").setAttribute("data-val", val);
+        document.getElementById("regReasonSelect").classList.remove("open");
+    }
+
+    function toggleRegReasonSelect() {
+        var sel = document.getElementById("regReasonSelect");
+        if (!sel) return false;
+        var isOpen = sel.classList.contains("open");
+        document.querySelectorAll(".te-modal-select.open, .rg-dd.open, .rg-prod-dd.open").forEach(function (s) {
+            s.classList.remove("open");
+            s.classList.remove("drop-up");
+        });
+        if (!isOpen) sel.classList.add("open");
+        return false;
+    }
+
+    /* ═══ DO REGISTER ═══ */
+    function onDoRegister() {
+        var reason = document.getElementById("regReasonSelect").getAttribute("data-val");
+        if (!reason) { rgShowMsg("Please select a reason."); return; }
+
+        var btn = document.getElementById("btnDoRegister");
+        btn.disabled = true; btn.textContent = "Registering...";
+
+        var multi = document.getElementById("modeM").checked;
+        var oilCo = document.getElementById("oilCompanySelect").getAttribute("data-val") || "";
+        var plantCode = document.getElementById("plantSelect").getAttribute("data-val") || "";
+        var plantDesc = document.getElementById("plantDesc").value || "";
+        var transCode, transDesc, destCode, destDesc, locCode, locDesc, custCode, custDesc, shipNo;
+
+        if (!multi) {
+            transCode = document.getElementById("transporterSelect").getAttribute("data-val") || "";
+            transDesc = document.getElementById("transporterDesc").value || "";
+            destCode  = document.getElementById("destinationSelect").getAttribute("data-val") || "";
+            destDesc  = document.getElementById("destinationDesc").value || "";
+            locCode   = document.getElementById("locationSelect").getAttribute("data-val") || "";
+            locDesc   = document.getElementById("locationDesc").value || "";
+            custCode  = document.getElementById("customerSelect").getAttribute("data-val") || "";
+            custDesc  = document.getElementById("customerDesc").value || "";
+            shipNo    = document.getElementById("shipmentNo").value || "";
+        } else {
+            transCode = document.getElementById("mTransporterSelect").getAttribute("data-val") || "";
+            transDesc = document.getElementById("mTransporterDesc").value || "";
+            destCode  = document.getElementById("mDestinationSelect").getAttribute("data-val") || "";
+            destDesc  = document.getElementById("mDestinationDesc").value || "";
+            locCode   = document.getElementById("mLocationSelect").getAttribute("data-val") || "";
+            locDesc   = document.getElementById("mLocationDesc").value || "";
+            custCode  = document.getElementById("mCustomerSelect").getAttribute("data-val") || "";
+            custDesc  = document.getElementById("mCustomerDesc").value || "";
+            shipNo    = document.getElementById("mShipmentNo").value || "";
+        }
+
+        var payload = {
+            truckAttendanceId: selectedAttId,
+            truckId:           selectedTruckId,
+            operationTypeId:   document.getElementById("opLoading").checked ? 1 : 2,
+            oilCompany:        oilCo,
+            plantCode:         plantCode,
+            plantDesc:         plantDesc,
+            transporterCode:   transCode,
+            transporterDesc:   transDesc,
+            destinationCode:   destCode,
+            destinationDesc:   destDesc,
+            locationCode:      locCode,
+            locationDesc:      locDesc,
+            customerCode:      custCode,
+            customerDesc:      custDesc,
+            shipmentNo:        shipNo,
+            reason:            reason,
+            compartments:      compartmentRows.map(function (r) {
+                return { compartmentNo: r.compartmentNo, productId: r.productId, quantity: r.quantity };
+            })
+        };
+
+        fetch("/TruckRegistration/PostRegistration", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+            btn.disabled = false; btn.textContent = "Register";
+            if (res.success) {
+                rgClose("rgManualModal", "rgManualBackdrop");
+                document.getElementById("rgSuccessText").textContent =
+                    "Truck Registered Successfully with registration no: " + res.registrationNumber;
+                rgOpen("rgSuccessModal", "rgSuccessBackdrop");
+            } else if (res.message === "NO_SOD") {
+                rgClose("rgManualModal", "rgManualBackdrop");
+                rgOpen("rgSodModal", "rgSodBackdrop");
+            } else {
+                rgShowMsg(res.message || "Registration failed.");
+            }
+        })
+        .catch(function () { btn.disabled = false; btn.textContent = "Register"; rgShowMsg("Network error."); });
+    }
+
+    function onSuccessOk() {
+        rgClose("rgSuccessModal", "rgSuccessBackdrop");
+        selectedAttId = null; selectedTruckId = null; selectedTruckNum = null; selectedAttRow = null; compartmentRows = [];
+        switchTab("search");
+        loadSearchTable();
+    }
+
+    function onClearRegister() {
+        if (selectedAttRow) populateTruckDetails();
+        var dds = ["oilCompanySelect","plantSelect","transporterSelect","destinationSelect","locationSelect","customerSelect","mTransporterSelect","mDestinationSelect","mLocationSelect","mCustomerSelect"];
+        var lbls= ["oilCompanyLabel","plantLabel","transporterLabel","destinationLabel","locationLabel","customerLabel","mTransporterLabel","mDestinationLabel","mLocationLabel","mCustomerLabel"];
+        for (var i = 0; i < dds.length; i++) {
+            var s = document.getElementById(dds[i]); if (s) s.removeAttribute("data-val");
+            var l = document.getElementById(lbls[i]); if (l) l.textContent = "Select";
+        }
+        var txts = ["plantDesc","transporterDesc","destinationDesc","locationDesc","customerDesc","mTransporterDesc","mDestinationDesc","mLocationDesc","mCustomerDesc","shipmentNo","mShipmentNo"];
+        for (var j = 0; j < txts.length; j++) { var fi = document.getElementById(txts[j]); if (fi) fi.value = ""; }
+        document.getElementById("opLoading").checked = true;
+        document.getElementById("modeS").checked = true;
+        onLoadModeChange(); onOpTypeChange();
+    }
+
+    /* ═══ DROPDOWN DATA LOADING ═══ */
+    function loadDropdownData() {
+        fetch("/TruckRegistration/GetOilCompanies")
+            .then(function (r) { return r.json(); })
+            .then(function (d) { oilCompList = d || []; fillDd("oilCompanyDropdown", oilCompList, "oilCompanySelect", "oilCompanyLabel", null); });
+
+        fetch("/TruckRegistration/GetPlantCodes")
+            .then(function (r) { return r.json(); })
+            .then(function (d) { plantList = d || []; fillDd("plantDropdown", plantList, "plantSelect", "plantLabel", "plantDesc"); });
+
+        fetch("/TruckRegistration/GetTransporterCodes")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                transporterList = d || [];
+                fillDd("transporterDropdown",  transporterList, "transporterSelect",  "transporterLabel",  "transporterDesc");
+                fillDd("mTransporterDropdown", transporterList, "mTransporterSelect", "mTransporterLabel", "mTransporterDesc");
+            });
+
+        fetch("/TruckRegistration/GetDestinationCodes")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                destinationList = d || [];
+                fillDd("destinationDropdown",  destinationList, "destinationSelect",  "destinationLabel",  "destinationDesc");
+                fillDd("mDestinationDropdown", destinationList, "mDestinationSelect", "mDestinationLabel", "mDestinationDesc");
+            });
+
+        fetch("/TruckRegistration/GetLocationCodes")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                locationList = d || [];
+                fillDd("locationDropdown",  locationList, "locationSelect",  "locationLabel",  "locationDesc");
+                fillDd("mLocationDropdown", locationList, "mLocationSelect", "mLocationLabel", "mLocationDesc");
+            });
+
+        fetch("/TruckRegistration/GetCustomerCodes")
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                customerList = d || [];
+                fillDd("customerDropdown", customerList, "customerSelect", "customerLabel", "customerDesc");
+                fillDd("mCustomerDropdown", customerList, "mCustomerSelect", "mCustomerLabel", "mCustomerDesc");
+            });
+
+        fetch("/TruckRegistration/GetProducts")
+            .then(function (r) { return r.json(); })
+            .then(function (d) { productsList = d || []; });
+    }
+
+    function fillDd(ddId, list, selId, labelId, descFieldId) {
+        var dd = document.getElementById(ddId);
+        if (!dd) return;
+        if (!list.length) { dd.innerHTML = '<div class="option" data-disabled="1">None available</div>'; return; }
+        dd.innerHTML = list.map(function (item) {
+            var display = item.code + (item.desc ? " \u2014 " + item.desc : "");
+            return '<div class="option" data-val="' + escAttr(item.code) + '" data-desc="' + escAttr(item.desc || "") + '">' + esc(display) + '</div>';
+        }).join("");
+    }
+
+    function loadRegReasons(cb) {
+        fetch("/TruckRegistration/GetRegistrationReasons")
+            .then(function (r) { return r.json(); })
+            .then(function (d) { regReasonList = d || []; if (cb) cb(); });
+    }
+
+    function renderRegReasons() {
+        var dd = document.getElementById("regReasonDropdown");
+        if (!regReasonList.length) { dd.innerHTML = '<div class="option" data-disabled="1">No reasons defined</div>'; return; }
+        dd.innerHTML = regReasonList.map(function (r) {
+            return '<div class="option" data-val="' + escAttr(r.reasonDescription) + '" onclick="selectRegReason(\'' + escJs(r.reasonDescription) + '\')">' + esc(r.reasonDescription) + '</div>';
+        }).join("");
+    }
+
+    /* ═══ DROPDOWN WIRING — delegation pattern (same as attendance page) ═══ */
+    function wireDropdowns() {
+        // Registration reason modal dropdown, scoped like attendance page.
+        document.addEventListener("click", function (e) {
+            if (!e.target.closest(".rg-dd, .te-modal-select, .rg-prod-dd")) {
+                document.querySelectorAll(".rg-dd.open, .te-modal-select.open, .rg-prod-dd.open").forEach(function (s) {
+                    s.classList.remove("open");
+                    s.classList.remove("drop-up");
+                });
+            }
+        });
+
+        // Option mousedown — select value
+        document.addEventListener("mousedown", function (e) {
+            // rg-dd option
+            var rgOpt = e.target.closest(".rg-dd .option");
+            if (rgOpt) {
+                if (rgOpt.closest(".te-modal-select")) return;
+                e.preventDefault(); e.stopPropagation();
+                if (rgOpt.getAttribute("data-disabled")) return;
+                var selEl = rgOpt.closest(".rg-dd");
+                if (!selEl) return;
+                var val  = rgOpt.getAttribute("data-val");
+                var desc = rgOpt.getAttribute("data-desc") || "";
+                var selId   = selEl.id;
+                var labelEl = document.getElementById(selId + "Label");
+                // fallback label pattern
+                if (!labelEl) {
+                    var lbl = selEl.querySelector(".rg-dd-trigger span:first-child");
+                    if (lbl) lbl.textContent = val;
+                } else {
+                    labelEl.textContent = val;
+                }
+                selEl.setAttribute("data-val", val);
+                selEl.classList.remove("open");
+                // Fill desc
+                var descMap = {
+                    "transporterSelect":  "transporterDesc",
+                    "plantSelect":        "plantDesc",
+                    "mTransporterSelect": "mTransporterDesc",
+                    "destinationSelect":  "destinationDesc",
+                    "mDestinationSelect": "mDestinationDesc",
+                    "locationSelect":     "locationDesc",
+                    "mLocationSelect":    "mLocationDesc",
+                    "customerSelect":     "customerDesc",
+                    "mCustomerSelect":    "mCustomerDesc"
+                };
+                if (descMap[selId]) { var fi = document.getElementById(descMap[selId]); if (fi) fi.value = desc; }
+                if (selId === "mTransporterSelect" || selId === "mDestinationSelect" || selId === "mLocationSelect" || selId === "mCustomerSelect") {
+                    renderLoadingTable();
+                }
+                return;
+            }
+
+            var modalOpt = e.target.closest("#regReasonDropdown .option");
+            if (modalOpt) {
+                e.preventDefault(); e.stopPropagation();
+                if (modalOpt.getAttribute("data-disabled")) return;
+                var val2 = modalOpt.getAttribute("data-val");
+                document.getElementById("regReasonLabel").textContent = val2;
+                document.getElementById("regReasonSelect").setAttribute("data-val", val2);
+                document.getElementById("regReasonSelect").classList.remove("open");
+            }
+        });
+    }
+
+    function toggleDd(selId) {
+        var el = document.getElementById(selId);
+        if (!el) return;
+        var wasOpen = el.classList.contains("open");
+        document.querySelectorAll(".rg-dd.open").forEach(function (s) { s.classList.remove("open"); });
+        if (!wasOpen) el.classList.add("open");
+    }
+
+    /* ═══ MODAL HELPERS ═══ */
+    function rgOpen(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = backdropId ? document.getElementById(backdropId) : null;
+        if (!m) return;
+        m.style.display = "block";
+        if (b) b.style.display = "block";
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                m.classList.add("show");
+                if (b) b.classList.add("show");
+            });
+        });
+    }
+
+    function rgClose(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = backdropId ? document.getElementById(backdropId) : null;
+        if (!m) return;
+        m.classList.remove("show");
+        if (b) b.classList.remove("show");
+        setTimeout(function () {
+            m.style.display = "none";
+            if (b) b.style.display = "none";
+        }, 220);
+    }
+
+    function rgShowMsg(txt) {
+        document.getElementById("rgErrText").textContent = txt;
+        rgOpen("rgErrModal", "rgErrBackdrop");
+    }
+
+    /* ═══ FORMATTERS ═══ */
+    function fmtDec(v) { return v == null ? "<span style='color:rgba(255,255,255,0.18)'>&mdash;</span>" : parseFloat(v).toFixed(2); }
+    function fmtDate(v) {
+        if (!v) return "<span style='color:rgba(255,255,255,0.18)'>&mdash;</span>";
+        var d = new Date(v); if (isNaN(d)) return esc(v);
+        return ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+    }
+    function licClass(v) {
+        if (!v) return "";
+        var diff = (new Date(v) - new Date()) / 86400000;
+        if (diff < 0) return "te-lic-exp"; if (diff < 30) return "te-lic-warn"; return "te-lic-ok";
+    }
+    function setEmpty(id, msg, show) { var el = document.getElementById(id); if (el) { el.textContent = msg; el.style.display = show ? "block" : "none"; } }
+    function esc(s)     { if (s == null) return ""; return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+    function escJs(s)   { if (s == null) return ""; return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'"); }
+    function escVal(v)  { if (v == null || v === "") return "&mdash;"; return esc(String(v)); }
+    function escAttr(s) { if (s == null) return ""; return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+    function fmtD(v)    { return fmtDec(v); }
+    function fmtDt(v)   { return fmtDate(v); }
+</script>

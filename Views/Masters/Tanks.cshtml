@@ -1,0 +1,1172 @@
+﻿@{
+    ViewBag.Title = "Tanks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="bay-module-card">
+
+    <div class="bay-content">
+
+        <div class="bay-form bcu-form tank-form">
+
+        <!-- ROW 1 -->
+        <div class="form-row four">
+            <div class="form-group">
+                <label>Tank No<span class="req">*</span></label>
+                <input type="number" id="tankNo" class="glass-input" />
+            </div>
+            <div class="form-group">
+                <label>Tank Name<span class="req">*</span></label>
+                <input type="text" id="tankName" class="glass-input" maxlength="50" />
+            </div>
+            <div class="form-group">
+                <label>SAP Tank No</label>
+                <input type="text" id="sapTankNo" class="glass-input" maxlength="50" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="tankDesc" class="glass-input" maxlength="50" />
+            </div>
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="form-row four">
+            <div class="form-group">
+                <label>Product</label>
+                <div class="custom-select" id="productSelect">
+                    <div class="select-trigger"><span>Select Product</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="productDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tank Type</label>
+                <div class="custom-select" id="tankTypeSelect">
+                    <div class="select-trigger"><span>Select Tank Type</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="tankTypeDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Tank Mode</label>
+                <div class="custom-select" id="tankModeSelect">
+                    <div class="select-trigger"><span>Select Tank Mode</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="tankModeDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Gauge Type</label>
+                <div class="custom-select" id="gaugeTypeSelect">
+                    <div class="select-trigger"><span>Select Gauge Type</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="gaugeTypeDropdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ROW 3 -->
+        <div class="form-row four">
+            <div class="form-group">
+                <label>Capacity</label>
+                <input type="number" id="tankCapacity" class="glass-input" step="0.001" />
+            </div>
+            <div class="form-group">
+                <label>Min Level</label>
+                <input type="number" id="minLevel" class="glass-input" step="0.001" />
+            </div>
+            <div class="form-group">
+                <label>Max Level</label>
+                <input type="number" id="maxLevel" class="glass-input" step="0.001" />
+            </div>
+            <div class="form-group">
+                <label>Safe Height Level</label>
+                <input type="number" id="safeHeightLevel" class="glass-input" step="0.001" />
+            </div>
+        </div>
+
+        <!-- BOTTOM: checks + actions -->
+        <div class="bcu-bottom">
+            <div class="bcu-checks">
+                <label class="bcu-checkbox">
+                    <input type="checkbox" id="tankIsActive" />
+                    <span class="bcu-checkmark"></span>
+                    Is Active
+                </label>
+            </div>
+            <div class="form-actions">
+                <button class="btn-primary" onclick="saveTank()">Save</button>
+                <button class="btn-secondary" onclick="clearTankForm()">Clear</button>
+                <button class="btn-danger" onclick="deleteTank()">Delete</button>
+            </div>
+        </div>
+
+    </div><!-- /.tank-form -->
+    <!-- ═══════════════════════════════════════════
+         TABLE SECTION
+    ═══════════════════════════════════════════ -->
+    <div class="bay-table tank-table">
+        <div class="table-header">
+            <div>Tank No</div>
+            <div>Tank Name</div>
+            <div>SAP Tank No</div>
+            <div>Product</div>
+            <div>Description</div>
+            <div>Tank Type</div>
+            <div>Tank Mode</div>
+            <div>Gauge Type</div>
+            <div>Capacity</div>
+            <div>Min Level</div>
+            <div>Max Level</div>
+            <div>Safe Height</div>
+            <div>Active</div>
+        </div>
+        <div class="table-body" id="tankTableBody">
+            <div class="table-empty" id="tankTableEmpty">Loading...</div>
+        </div>
+    </div>
+    </div><!-- /.bay-content -->
+</div><!-- /.bay-module-card -->
+<!-- ═══════════════════════════════════════════
+     EDIT MODAL
+═══════════════════════════════════════════ -->
+    <div class="bcum-backdrop" id="tankBackdrop" onclick="closeTankModal()"></div>
+    <div class="bcum-modal" id="tankModal">
+        <div class="bcum-header">
+            <div class="bcum-title">
+                <span class="bcum-icon">&#9998;</span> Edit Tank
+            </div>
+            <button class="bcum-close" onclick="closeTankModal()">&#10005;</button>
+        </div>
+        <div class="bcum-body">
+            <input type="hidden" id="editTankId" />
+
+            <!-- ROW 1 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Tank No</label>
+                    <input type="number" id="editTankNo" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Tank Name</label>
+                    <input type="text" id="editTankName" class="glass-input" readonly style="opacity:0.55;cursor:default;" />
+                </div>
+                <div class="form-group">
+                    <label>SAP Tank No</label>
+                    <input type="text" id="editSapTankNo" class="glass-input" maxlength="50" />
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="editTankDesc" class="glass-input" maxlength="50" />
+                </div>
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product</label>
+                    <div class="custom-select" id="editProductSelect">
+                        <div class="select-trigger"><span>Select Product</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editProductDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tank Type</label>
+                    <div class="custom-select" id="editTankTypeSelect">
+                        <div class="select-trigger"><span>Select Tank Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editTankTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Tank Mode</label>
+                    <div class="custom-select" id="editTankModeSelect">
+                        <div class="select-trigger"><span>Select Tank Mode</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editTankModeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Gauge Type</label>
+                    <div class="custom-select" id="editGaugeTypeSelect">
+                        <div class="select-trigger"><span>Select Gauge Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editGaugeTypeDropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Capacity</label>
+                    <input type="number" id="editCapacity" class="glass-input" step="0.001" />
+                </div>
+                <div class="form-group">
+                    <label>Min Level</label>
+                    <input type="number" id="editMinLevel" class="glass-input" step="0.001" />
+                </div>
+                <div class="form-group">
+                    <label>Max Level</label>
+                    <input type="number" id="editMaxLevel" class="glass-input" step="0.001" />
+                </div>
+                <div class="form-group">
+                    <label>Safe Height Level</label>
+                    <input type="number" id="editSafeHeight" class="glass-input" step="0.001" />
+                </div>
+            </div>
+
+            <!-- ROW 4: Is Active checkbox -->
+            <div class="form-row tank-check-row">
+                <div class="form-group" style="flex-direction:row;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="editTankIsActive" />
+                        <span class="bcu-checkmark"></span>
+                        Is Active
+                    </label>
+                </div>
+                <div class="form-group" style="flex:1;"></div>
+                <div class="form-group" style="flex:1;"></div>
+                <div class="form-group" style="flex:1;"></div>
+            </div>
+
+        </div><!-- /.bcum-body -->
+        <div class="bcum-footer">
+            <div style="flex:1;"></div>
+            <button class="btn-secondary" onclick="closeTankModal()">Cancel</button>
+            <button class="btn-primary" onclick="updateTankFromModal()">Update</button>
+        </div>
+    </div><!-- /#tankModal -->
+<!-- ═══════════════════════════════════════════
+     PAGE-SCOPED STYLES
+═══════════════════════════════════════════ -->
+<style>
+
+    /* ── Tank form: matches BCU 4-col layout ── */
+    .tank-form {
+        width: 100%;
+        overflow: visible !important;
+    }
+
+        .tank-form .form-row {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 1px;
+            overflow: visible !important;
+        }
+
+            .tank-form .form-row.four {
+                display: flex;
+                gap: 14px;
+            }
+
+        .tank-form .form-group {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            overflow: visible !important;
+        }
+
+            .tank-form .form-group > label:not(.bcu-checkbox) {
+                font-size: 11px;
+                color: rgba(255,255,255,0.7);
+                margin-bottom: 5px;
+                line-height: 1;
+            }
+
+        .tank-form .glass-input,
+        .tank-form .select-trigger {
+            height: 38px;
+            width: 100%;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+            .tank-form .glass-input:focus {
+                border-color: rgba(225,6,0,0.5);
+                box-shadow: 0 0 0 2px rgba(225,6,0,0.12);
+            }
+
+        .tank-form .select-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        /* ── Custom select ── */
+        .tank-form .custom-select {
+            position: relative;
+            width: 100%;
+        }
+
+            .tank-form .custom-select.open {
+                z-index: 99999;
+            }
+
+        .tank-form .select-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            max-height: 220px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            background: rgba(20,20,20,0.98);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            z-index: 99999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-sizing: border-box;
+        }
+
+        .tank-form .custom-select.open .select-dropdown {
+            display: block;
+        }
+
+        .tank-form,
+        .tank-form .form-row,
+        .tank-form .form-group,
+        .bay-module-card,
+        .bay-content {
+            overflow: visible !important;
+        }
+
+    /* ── Bottom row ── */
+    .bcu-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    /* Buttons spacing */
+    .action-buttons,
+    .form-actions,
+    .form-footer {
+        margin-top: -4px !important;
+        margin-bottom: -4px !important;
+    }
+    /* ── Arrow ── */
+    .tank-form .select-trigger .arrow {
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid rgba(255,255,255,0.35);
+        flex-shrink: 0;
+    }
+
+    /* ── Dropdown options ── */
+    .tank-form .select-dropdown .option {
+        padding: 8px 12px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.85);
+        cursor: pointer;
+        transition: background 0.1s;
+    }
+
+        .tank-form .select-dropdown .option:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+    /* ── Table: 13 cols ── */
+    .tank-table .table-header,
+    .tank-table .table-row {
+        grid-template-columns: 70px 1.2fr 1fr 1.2fr 1.2fr 1fr 1fr 1fr 0.8fr 0.8fr 0.8fr 1fr 0.7fr;
+        font-size: 11px;
+    }
+
+    .tank-table {
+        flex: 1;
+        min-height: 0;
+    }
+
+        .tank-table .table-row {
+            cursor: pointer;
+        }
+
+            .tank-table .table-row:hover {
+                background: rgba(255,255,255,0.04);
+            }
+
+            .tank-table .table-row.tank-selected {
+                background: rgba(225,6,0,0.07) !important;
+                border-left: 2px solid #e10600;
+            }
+
+    /* ═══════════════════════════════════════════
+           TANK MODAL — mirrors BCU modal exactly
+        ═══════════════════════════════════════════ */
+    #tankModal {
+        width: min(860px, 94%) !important;
+    }
+
+        #tankModal .bcum-body {
+            padding: 20px 20px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+            #tankModal .bcum-body .form-row {
+                display: flex;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            #tankModal .bcum-body .form-group {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-width: 0;
+                gap: 0;
+            }
+
+                #tankModal .bcum-body .form-group > label:not(.bcu-checkbox) {
+                    font-size: 11px;
+                    color: rgba(255,255,255,0.55);
+                    margin-bottom: 6px;
+                    line-height: 1;
+                    letter-spacing: 0.2px;
+                }
+
+            #tankModal .bcum-body .glass-input {
+                height: 38px;
+                padding: 0 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.04);
+                color: #fff;
+                font-size: 13px;
+                box-sizing: border-box;
+                width: 100%;
+                line-height: 38px;
+                outline: none;
+            }
+
+                #tankModal .bcum-body .glass-input:focus {
+                    border-color: rgba(225,6,0,0.5);
+                    box-shadow: 0 0 0 2px rgba(225,6,0,0.15);
+                }
+
+            #tankModal .bcum-body .select-trigger {
+                height: 38px;
+                padding: 0 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.04);
+                color: #fff;
+                font-size: 13px;
+                box-sizing: border-box;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                cursor: pointer;
+                width: 100%;
+            }
+
+                #tankModal .bcum-body .select-trigger .arrow {
+                    width: 0;
+                    height: 0;
+                    border-left: 4px solid transparent;
+                    border-right: 4px solid transparent;
+                    border-top: 5px solid rgba(255,255,255,0.35);
+                    flex-shrink: 0;
+                }
+
+            #tankModal .bcum-body .custom-select {
+                position: relative;
+            }
+
+                #tankModal .bcum-body .custom-select.open {
+                    z-index: 10000;
+                }
+
+            #tankModal .bcum-body .select-dropdown {
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                width: 100%;
+                max-height: 180px;
+                overflow-x: hidden;
+                overflow-y: auto;
+                scrollbar-gutter: stable;
+                z-index: 10001;
+                background: rgba(20,20,20,0.98);
+                border: 1px solid rgba(255,255,255,0.12);
+                border-radius: 10px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+                display: none;
+            }
+
+            #tankModal .bcum-body .custom-select.open .select-dropdown {
+                display: block;
+            }
+
+            #tankModal .bcum-body .select-dropdown .option {
+                padding: 8px 12px;
+                font-size: 12px;
+                color: rgba(255,255,255,0.85);
+                cursor: pointer;
+                transition: background 0.1s;
+            }
+
+                #tankModal .bcum-body .select-dropdown .option:hover {
+                    background: rgba(255,255,255,0.08);
+                }
+
+            /* ── Checkbox row in modal: no last-child override ── */
+            #tankModal .bcum-body .tank-check-row {
+                display: flex;
+                align-items: center;
+                min-height: 38px;
+                gap: 0;
+            }
+
+                #tankModal .bcum-body .tank-check-row .form-group {
+                    flex-direction: row;
+                    align-items: center;
+                    justify-content: flex-start;
+                }
+
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+    /* ── Modal backdrop + modal base — copied from BCU since not in site.css ── */
+    .bcum-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+        .bcum-backdrop.show {
+            opacity: 1;
+        }
+
+    .bcum-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -48%) scale(0.95);
+        background: linear-gradient(160deg, rgba(42,42,42,0.99) 0%, rgba(22,22,22,0.97) 100%);
+        border: 1px solid rgba(255,255,255,0.13);
+        border-radius: 14px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.2,.8,.2,1);
+    }
+
+        .bcum-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+    .bcum-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .bcum-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        letter-spacing: 0.4px;
+    }
+
+    .bcum-icon {
+        color: #e10600;
+        font-size: 15px;
+    }
+
+    .bcum-close {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.35);
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px 7px;
+        border-radius: 5px;
+        transition: color 0.15s, background 0.15s;
+        line-height: 1;
+    }
+
+        .bcum-close:hover {
+            color: #e10600;
+            background: rgba(225,6,0,0.1);
+        }
+
+    .bcum-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 20px 18px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* ── BCU-style checkbox — copied from BCU since not in site.css ── */
+    .bcu-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 12px;
+        color: rgba(255,255,255,0.72);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+        .bcu-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+    .bcu-checkmark {
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark {
+        background: #e10600;
+        border-color: #e10600;
+    }
+
+    .bcu-checkmark::after {
+        content: "✓";
+        font-size: 9px;
+        color: #fff;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark::after {
+        opacity: 1;
+    }
+
+    /* ── Buttons — restore exactly as BCU ── */
+    .btn-primary {
+        position: relative;
+        padding: 8px 18px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(180deg, #ff4d4d 0%, #ff1f1f 40%, #cc0000 70%, #990000 100%);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4), 0 0 8px rgba(255,0,0,0.25);
+        transition: all 0.15s ease;
+    }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95) translateY(1px);
+        }
+
+    .btn-secondary {
+        padding: 8px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: rgba(255,255,255,0.85);
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        transition: all 0.15s ease;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+    .btn-danger {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(225,6,0,0.38);
+        background: rgba(225,6,0,0.09);
+        color: #ff5555;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+        .btn-danger:hover {
+            background: rgba(225,6,0,0.2);
+            border-color: #e10600;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.95);
+        }
+
+    /* ── Bool cells ── */
+    .bcu-bool-yes {
+        color: #00ff9c;
+        font-size: 13px;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .bcu-bool-no {
+        color: rgba(255,255,255,0.18);
+        font-size: 13px;
+    }
+
+    /* ── table empty ── */
+    .table-empty {
+        padding: 28px;
+        text-align: center;
+        color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    .tank-table .table-header div,
+    .tank-table .table-row div {
+        display: flex;
+        align-items: center;
+        justify-content: center; /* centers content */
+        text-align: center;
+    }
+
+</style>
+
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+
+    /* ═══════════════════════════
+       STATE
+    ═══════════════════════════ */
+    var tankSelId   = null;
+    var tankEditing = false;
+
+    /* ═══════════════════════════
+       BOOT
+    ═══════════════════════════ */
+    document.addEventListener("DOMContentLoaded", function () {
+        loadTankTable();
+        loadTankDropdowns();
+        wireTankSelects();
+    });
+
+    /* ═══════════════════════════
+       DROPDOWNS
+    ═══════════════════════════ */
+    function loadTankDropdowns() {
+        // Products
+        fetch("/Tanks/GetProducts")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var html = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+                setDropHtml("productDropdown",     html);
+                setDropHtml("editProductDropdown", html);
+            });
+
+        // Tank Types
+        fetch("/Tanks/GetTankTypes")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var html = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+                setDropHtml("tankTypeDropdown",     html);
+                setDropHtml("editTankTypeDropdown", html);
+            });
+
+        // Tank Modes
+        fetch("/Tanks/GetTankModes")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var html = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+                setDropHtml("tankModeDropdown",     html);
+                setDropHtml("editTankModeDropdown", html);
+            });
+
+        // Gauge Types
+        fetch("/Tanks/GetGaugeTypes")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var html = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+                setDropHtml("gaugeTypeDropdown",     html);
+                setDropHtml("editGaugeTypeDropdown", html);
+            });
+    }
+
+    function setDropHtml(id, html) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    }
+
+    /* ═══════════════════════════
+       TABLE LOAD & RENDER
+    ═══════════════════════════ */
+    function loadTankTable() {
+        fetch("/Tanks/GetTanks")
+            .then(function(r) { return r.json(); })
+            .then(function(data) { renderTankTable(data); })
+            .catch(function() {
+                var e = document.getElementById("tankTableEmpty");
+                if (e) { e.style.display = "block"; e.textContent = "Failed to load."; }
+            });
+    }
+
+    function renderTankTable(list) {
+        var body  = document.getElementById("tankTableBody");
+        var empty = document.getElementById("tankTableEmpty");
+        if (!body) return;
+
+        if (!list || !list.length) {
+            body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "No records found."; }
+            return;
+        }
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = list.map(function(t) {
+            var sel = t.tankId === tankSelId ? " tank-selected" : "";
+            return '<div class="table-row' + sel + '" data-id="' + t.tankId + '"' +
+                   ' onclick="onTankRowClick(' + t.tankId + ')"' +
+                   ' ondblclick="openTankModal(' + t.tankId + ')">' +
+                   '<div>' + (t.tankNo   ?? '—') + '</div>' +
+                   '<div>' + esc(t.tankName)     + '</div>' +
+                   '<div>' + esc(t.sapTankNo)    + '</div>' +
+                   '<div>' + esc(t.productName)  + '</div>' +
+                   '<div>' + esc(t.description)  + '</div>' +
+                   '<div>' + esc(t.tankTypeName) + '</div>' +
+                   '<div>' + esc(t.tankModeName) + '</div>' +
+                   '<div>' + esc(t.gaugeTypeName)+ '</div>' +
+                   '<div>' + fmtDec(t.capacity)  + '</div>' +
+                   '<div>' + fmtDec(t.minLevel)  + '</div>' +
+                   '<div>' + fmtDec(t.maxLevel)  + '</div>' +
+                   '<div>' + fmtDec(t.safeHeightLevel) + '</div>' +
+                   '<div class="' + (t.isActive ? 'bcu-bool-yes' : 'bcu-bool-no') + '">' +
+                       (t.isActive ? '&#10004;' : '&mdash;') +
+                   '</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    /* ═══════════════════════════
+       ROW CLICK — fill form
+    ═══════════════════════════ */
+    function onTankRowClick(id) {
+        if (tankSelId === id) {
+            tankSelId = null; tankEditing = false;
+            clearTankForm();
+            document.querySelectorAll(".tank-table .table-row").forEach(function(r) { r.classList.remove("tank-selected"); });
+            return;
+        }
+        tankSelId   = id;
+        tankEditing = true;
+        document.querySelectorAll(".tank-table .table-row").forEach(function(r) {
+            r.classList.toggle("tank-selected", parseInt(r.dataset.id) === id);
+        });
+
+        fetch("/Tanks/GetTankDetail/" + id)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                document.getElementById("tankNo").value          = d.tankNo       != null ? d.tankNo       : "";
+                document.getElementById("tankName").value        = d.tankName     || "";
+                document.getElementById("sapTankNo").value       = d.sapTankNo    || "";
+                document.getElementById("tankDesc").value        = d.description  || "";
+                document.getElementById("tankCapacity").value    = d.capacity     != null ? d.capacity     : "";
+                document.getElementById("minLevel").value        = d.minLevel     != null ? d.minLevel     : "";
+                document.getElementById("maxLevel").value        = d.maxLevel     != null ? d.maxLevel     : "";
+                document.getElementById("safeHeightLevel").value = d.safeHeightLevel != null ? d.safeHeightLevel : "";
+                document.getElementById("tankIsActive").checked  = d.isActive     || false;
+
+                setTankDrop("productSelect",   d.productId,    d.productName   || "Select Product");
+                setTankDrop("tankTypeSelect",  d.tankType,     d.tankTypeName  || "Select Tank Type");
+                setTankDrop("tankModeSelect",  d.tankModeName, d.tankModeLabel || "Select Tank Mode");
+                setTankDrop("gaugeTypeSelect", d.gaugeType,    d.gaugeTypeName || "Select Gauge Type");
+            });
+    }
+
+    /* ═══════════════════════════
+       SAVE
+    ═══════════════════════════ */
+    function saveTank() {
+        var name = document.getElementById("tankName").value.trim();
+        var no   = document.getElementById("tankNo").value;
+
+        if (!name) { alert("Tank Name is required."); return; }
+        if (!no)   { alert("Tank No is required.");   return; }
+
+        var payload = buildTankPayload();
+        payload.tankId = tankEditing ? tankSelId : 0;
+
+        fetch("/Tanks/SaveTank", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { clearTankForm(); loadTankTable(); }
+            else alert(res.message || "Save failed.");
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    function deleteTank() {
+        if (!tankSelId) { alert("Select a row first."); return; }
+        if (!confirm("Delete selected tank?")) return;
+
+        fetch("/Tanks/DeleteTank", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(tankSelId)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { clearTankForm(); loadTankTable(); }
+            else alert(res.message || "Delete failed.");
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    function clearTankForm() {
+        ["tankNo","tankName","sapTankNo","tankDesc",
+         "tankCapacity","minLevel","maxLevel","safeHeightLevel"].forEach(function(id) {
+            var el = document.getElementById(id); if (el) el.value = "";
+        });
+        document.getElementById("tankIsActive").checked = false;
+        setTankDrop("productSelect",   null, "Select Product");
+        setTankDrop("tankTypeSelect",  null, "Select Tank Type");
+        setTankDrop("tankModeSelect",  null, "Select Tank Mode");
+        setTankDrop("gaugeTypeSelect", null, "Select Gauge Type");
+        tankSelId   = null;
+        tankEditing = false;
+        document.querySelectorAll(".tank-table .table-row").forEach(function(r) { r.classList.remove("tank-selected"); });
+    }
+
+    /* ═══════════════════════════
+       EDIT MODAL
+    ═══════════════════════════ */
+    function openTankModal(id) {
+        fetch("/Tanks/GetTankDetail/" + id)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                document.getElementById("editTankId").value       = d.tankId;
+                document.getElementById("editTankNo").value       = d.tankNo       != null ? d.tankNo       : "";
+                document.getElementById("editTankName").value     = d.tankName     || "";
+                document.getElementById("editSapTankNo").value    = d.sapTankNo    || "";
+                document.getElementById("editTankDesc").value     = d.description  || "";
+                document.getElementById("editCapacity").value     = d.capacity     != null ? d.capacity     : "";
+                document.getElementById("editMinLevel").value     = d.minLevel     != null ? d.minLevel     : "";
+                document.getElementById("editMaxLevel").value     = d.maxLevel     != null ? d.maxLevel     : "";
+                document.getElementById("editSafeHeight").value   = d.safeHeightLevel != null ? d.safeHeightLevel : "";
+                document.getElementById("editTankIsActive").checked = d.isActive   || false;
+
+                // Copy dropdown options to modal
+                copyDropOpts("productDropdown",   "editProductDropdown");
+                copyDropOpts("tankTypeDropdown",  "editTankTypeDropdown");
+                copyDropOpts("tankModeDropdown",  "editTankModeDropdown");
+                copyDropOpts("gaugeTypeDropdown", "editGaugeTypeDropdown");
+
+                setTankDrop("editProductSelect",   d.productId,    d.productName   || "Select Product");
+                setTankDrop("editTankTypeSelect",  d.tankType,     d.tankTypeName  || "Select Tank Type");
+                setTankDrop("editTankModeSelect",  d.tankModeName, d.tankModeLabel || "Select Tank Mode");
+                setTankDrop("editGaugeTypeSelect", d.gaugeType,    d.gaugeTypeName || "Select Gauge Type");
+
+                document.querySelectorAll(".tank-table .table-row").forEach(function(r) {
+                    r.classList.toggle("tank-selected", parseInt(r.dataset.id) === id);
+                });
+
+                var m = document.getElementById("tankModal");
+                var b = document.getElementById("tankBackdrop");
+                m.style.display = "block";
+                b.style.display = "block";
+                requestAnimationFrame(function() { requestAnimationFrame(function() {
+                    m.classList.add("show");
+                    b.classList.add("show");
+                }); });
+            });
+    }
+
+    function closeTankModal() {
+        var m = document.getElementById("tankModal");
+        var b = document.getElementById("tankBackdrop");
+        if (!m || !b) return;
+        m.classList.remove("show");
+        b.classList.remove("show");
+        setTimeout(function() { m.style.display = "none"; b.style.display = "none"; }, 220);
+        document.querySelectorAll(".tank-table .table-row").forEach(function(r) { r.classList.remove("tank-selected"); });
+        tankSelId = null;
+    }
+
+    function updateTankFromModal() {
+        var id = parseInt(document.getElementById("editTankId").value);
+        var payload = {
+            tankId:          id,
+            tankNo:          parseInt(document.getElementById("editTankNo").value)   || null,
+            tankName:        document.getElementById("editTankName").value.trim(),
+            sapTankNo:       document.getElementById("editSapTankNo").value.trim()   || null,
+            description:     document.getElementById("editTankDesc").value.trim()    || null,
+            productId:       getTankDropId("editProductSelect"),
+            tankType:        getTankDropId("editTankTypeSelect"),
+            tankModeName:    getTankDropId("editTankModeSelect"),
+            gaugeType:       getTankDropId("editGaugeTypeSelect"),
+            capacity:        parseDecOrNull(document.getElementById("editCapacity").value),
+            minLevel:        parseDecOrNull(document.getElementById("editMinLevel").value),
+            maxLevel:        parseDecOrNull(document.getElementById("editMaxLevel").value),
+            safeHeightLevel: parseDecOrNull(document.getElementById("editSafeHeight").value),
+            isActive:        document.getElementById("editTankIsActive").checked
+        };
+
+        if (!payload.tankName) { alert("Tank Name is required."); return; }
+
+        fetch("/Tanks/UpdateTank", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) {
+                tankSelId = null; clearTankForm(); closeTankModal(); loadTankTable();
+            } else {
+                alert(res.message || "Update failed.");
+            }
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    /* ═══════════════════════════
+       HELPERS — payload
+    ═══════════════════════════ */
+    function buildTankPayload() {
+        return {
+            tankNo:          parseInt(document.getElementById("tankNo").value)   || null,
+            tankName:        document.getElementById("tankName").value.trim(),
+            sapTankNo:       document.getElementById("sapTankNo").value.trim()   || null,
+            description:     document.getElementById("tankDesc").value.trim()    || null,
+            productId:       getTankDropId("productSelect"),
+            tankType:        getTankDropId("tankTypeSelect"),
+            tankModeName:    getTankDropId("tankModeSelect"),
+            gaugeType:       getTankDropId("gaugeTypeSelect"),
+            capacity:        parseDecOrNull(document.getElementById("tankCapacity").value),
+            minLevel:        parseDecOrNull(document.getElementById("minLevel").value),
+            maxLevel:        parseDecOrNull(document.getElementById("maxLevel").value),
+            safeHeightLevel: parseDecOrNull(document.getElementById("safeHeightLevel").value),
+            isActive:        document.getElementById("tankIsActive").checked
+        };
+    }
+
+    /* ═══════════════════════════
+       HELPERS — dropdowns
+    ═══════════════════════════ */
+    function setTankDrop(selectId, id, label) {
+        var sel = document.getElementById(selectId);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", id != null ? id : "");
+        var sp = sel.querySelector(".select-trigger span");
+        if (sp) sp.textContent = label || "Select";
+    }
+
+    function getTankDropId(selectId) {
+        var sel = document.getElementById(selectId);
+        if (!sel) return null;
+        var v = sel.getAttribute("data-selected-id");
+        return v ? (parseInt(v) || null) : null;
+    }
+
+    function copyDropOpts(sourceId, targetId) {
+        var src = document.getElementById(sourceId);
+        var tgt = document.getElementById(targetId);
+        if (src && tgt) tgt.innerHTML = src.innerHTML;
+    }
+
+    /* ═══════════════════════════
+       HELPERS — selects wiring
+    ═══════════════════════════ */
+    function wireTankSelects() {
+        document.addEventListener("click", function(e) {
+            var trigger = e.target.closest(".select-trigger");
+            if (trigger) {
+                e.stopPropagation();
+                var sel    = trigger.closest(".custom-select");
+                var isOpen = sel.classList.contains("open");
+                document.querySelectorAll(".custom-select.open").forEach(function(s) { s.classList.remove("open"); });
+                if (!isOpen) sel.classList.add("open");
+                return;
+            }
+            if (!e.target.closest(".custom-select")) {
+                document.querySelectorAll(".custom-select.open").forEach(function(s) { s.classList.remove("open"); });
+            }
+        });
+
+        document.addEventListener("mousedown", function(e) {
+            var opt = e.target.closest(".option");
+            if (!opt) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var sel = opt.closest(".custom-select");
+            if (!sel) return;
+            var sp = sel.querySelector(".select-trigger span");
+            if (sp) sp.textContent = opt.textContent.trim();
+            sel.setAttribute("data-selected-id", opt.getAttribute("data-id") || "");
+            sel.classList.remove("open");
+        });
+    }
+
+    /* ═══════════════════════════
+       HELPERS — number formatting
+    ═══════════════════════════ */
+    function fmtDec(v)  { return v != null ? parseFloat(v).toFixed(2) : "&mdash;"; }
+
+    function parseDecOrNull(v) {
+        if (v === "" || v == null) return null;
+        var n = parseFloat(v); return isNaN(n) ? null : n;
+    }
+
+    function esc(s) {
+        if (s == null) return "";
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+</script>

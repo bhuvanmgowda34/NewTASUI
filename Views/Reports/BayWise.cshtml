@@ -1,0 +1,114 @@
+﻿<style>
+    .report-controls .bay-dropdown,
+    .report-controls #baySelect,
+    .report-controls #baySelect .select-dropdown {
+        width: 220px;
+        max-width: 220px;
+        box-sizing: border-box;
+    }
+
+    .report-controls #baySelect .select-trigger {
+        width: auto;
+        max-width: none;
+        height: 32px;
+        min-height: 32px;
+        padding: 6px 10px;
+        box-sizing: content-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .report-controls .form-actions {
+        margin-top: 0;
+    }
+</style>
+    <div class="bay-module-card">
+
+    <!-- FILTER PANEL -->
+    <div class="report-filter">
+
+        <div class="form-row">
+
+            <div class="form-group">
+                <label>From Date</label>
+                <input type="datetime-local" id="fromDate" class="glass-input" />
+            </div>
+
+            <div class="form-group">
+                <label>To Date</label>
+                <input type="datetime-local" id="toDate" class="glass-input" />
+            </div>
+
+            <div class="form-group">
+                <label>Bay</label>
+                <div class="report-controls">
+
+                    <div class="bay-dropdown">
+                        <div class="custom-select" id="baySelect">
+
+                            <div class="select-trigger">
+                                <span>All Bays</span>
+                                <div class="arrow"></div>
+                            </div>
+
+                            <div class="select-dropdown" id="bayDropdown">
+                                <div class="option">All Bays</div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="form-actions">
+
+                        <button class="btn-primary" onclick="loadReport()">View</button>
+                        <button class="btn-secondary" onclick="exportPDF()">Export PDF</button>
+                        <button class="btn-secondary" onclick="exportExcel()">Export Excel</button>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- TABLE -->
+    <div class="report-table">
+
+        <div class="report-scroll-x">
+
+            <div class="report-inner">
+
+                <!-- HEADER -->
+                <div class="report-header">
+                    <div>Date & Time</div>
+                    <div>Gantry</div>
+                    <div>Bay No</div>
+                    <div>Fan No</div>
+                    <div>Truck No</div>
+                    <div>Preset</div>
+                    <div>BaseQty</div>
+                    <div>BlendQty</div>
+                    <div>Add1Qty</div>
+                    <div>Add2Qty</div>
+                    <div>QtyFilled</div>
+                    <div>TopUp</div>
+                    <div>Decant</div>
+                    <div>Effective</div>
+                </div>
+
+                <!-- BODY -->
+                <div class="report-body" id="reportBody"></div>
+                <div class="report-empty" id="reportEmpty">
+                    No Data Available
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    </div>

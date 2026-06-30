@@ -1,0 +1,1695 @@
+﻿@* BCU.cshtml — BCUs + BCU Products tabs *@
+
+<div class="bay-module-card">
+
+    <!-- TABS -->
+    <div class="bay-toggle">
+        <div class="bay-tab active" id="tabBCU">BCUs</div>
+        <div class="bay-tab" id="tabBCUProd">BCU Products</div>
+        <div class="bay-indicator"></div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════
+         BCU TAB
+    ════════════════════════════════════════════════ -->
+    <div class="bay-content bcu-tab-content" id="bcuTab">
+
+        <!-- FORM -->
+        <div class="bay-form bcu-form">
+
+            <!-- ROW 1 -->
+            <div class="form-row four">
+                <div class="form-group">
+                    <label>BCU Name<span class="req">*</span></label>
+                    <input type="text" id="bcuName" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>BCU Number<span class="req">*</span></label>
+                    <input type="number" id="bcuNumber" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>BCU Type</label>
+                    <div class="custom-select" id="bcuTypeSelect">
+                        <div class="select-trigger"><span>Select Type</span></div>
+                        <div class="select-dropdown" id="bcuTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bay</label>
+                    <div class="custom-select" id="bcuBaySelect">
+                        <div class="select-trigger"><span>Select Bay</span></div>
+                        <div class="select-dropdown" id="bcuBayDropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 2 -->
+            <div class="form-row four">
+                <div class="form-group">
+                    <label>Slave Address<span class="req">*</span></label>
+                    <input type="number" id="bcuSlaveAddr" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Secondary Slave Address</label>
+                    <input type="number" id="bcuRedSlaveAddr" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Primary COM Port<span class="req">*</span></label>
+                    <div class="custom-select" id="bcuComPortSelect">
+                        <div class="select-trigger"><span>Select Port</span></div>
+                        <div class="select-dropdown" id="bcuComPortDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Secondary COM Port</label>
+                    <div class="custom-select" id="bcuRedComPortSelect">
+                        <div class="select-trigger"><span>Select Port</span></div>
+                        <div class="select-dropdown" id="bcuRedComPortDropdown"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3 -->
+            <div class="form-row four">
+                <div class="form-group">
+                    <label>Arm No</label>
+                    <input type="number" id="bcuArmNo" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Arm Type</label>
+                    <div class="custom-select" id="bcuArmTypeSelect">
+                        <div class="select-trigger"><span>Select Arm Type</span></div>
+                        <div class="select-dropdown" id="bcuArmTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Blend Mode</label>
+                    <div class="custom-select" id="BlendModeSelect">
+                        <div class="select-trigger"><span>Select Blend Mode</span></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Meter Type</label>
+                    <div class="custom-select" id="MeterTypeSelect">
+                        <div class="select-trigger"><span>Select Meter Type</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bcu-bottom">
+                <!-- LEFT SIDE -->
+                <div class="bcu-checks">
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="bcuIsCardReader" />
+                        <span class="bcu-checkmark"></span>
+                        Is Cardreader Integrated
+                    </label>
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="bcuIsActive" />
+                        <span class="bcu-checkmark"></span>
+                        Is Active
+                    </label>
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="bcuMFMStatus" />
+                        <span class="bcu-checkmark"></span>
+                        MFM Status
+                    </label>
+                </div>
+                <!-- RIGHT SIDE -->
+                <div class="form-actions">
+                    <button class="btn-primary" onclick="saveBCU()">Save</button>
+                    <button class="btn-secondary" onclick="clearBCUForm()">Clear</button>
+                    <button class="btn-danger" onclick="deleteBCU()">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABLE -->
+        <div class="bay-table bcu-table">
+            <div class="table-header">
+                <div>BCU Name</div>
+                <div>BCU No</div>
+                <div>Bay Name</div>
+                <div>BCU Type</div>
+                <div>Pri. ComPort</div>
+                <div>Pri. Addr</div>
+                <div>Sec. ComPort</div>
+                <div>Sec. Addr</div>
+                <div>Card Reader</div>
+                <div>Active</div>
+                <div>Arm Type</div>
+                <div>Arm No</div>
+                <div>MFM</div>
+            </div>
+            <div class="table-body" id="bcuTableBody">
+                <div class="table-empty" id="bcuTableEmpty">Loading...</div>
+            </div>
+        </div>
+
+    </div><!-- /#bcuTab -->
+    <!-- ═══════════════════════════════════════════
+         BCU PRODUCTS TAB
+    ════════════════════════════════════════════════ -->
+    <div class="bay-content bcu-tab-content hidden" id="bcuProdTab">
+
+        <!-- BCU selector -->
+        <div class="bcu-prod-top">
+            <div class="form-group bcu-prod-selector">
+                <label>BCU</label>
+                <div class="custom-select" id="prodBcuSelect">
+                    <div class="select-trigger"><span>Select BCU</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="prodBcuDropdown"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dual list + transfer buttons -->
+        <div class="bcu-prod-body">
+
+            <!-- Available products list -->
+            <div class="material-box">
+                <div class="box-title">List of Available Products</div>
+                <div class="material-list" id="availableProducts">
+                    <div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">Select a BCU to load products</div>
+                </div>
+            </div>
+
+            <!-- Transfer buttons -->
+            <div class="material-controls">
+                <button class="transfer-btn" onclick="addProduct()">&gt;</button>
+                <button class="transfer-btn" onclick="removeProduct()">&lt;</button>
+            </div>
+
+            <!-- Associated products list -->
+            <div class="material-box">
+                <div class="box-title">List of BCU Associated Products</div>
+                <div class="material-list" id="associatedProducts">
+                    <div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">Select a BCU to load products</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- BCU Products detail table -->
+        <div class="bay-table bcu-prod-table">
+            <div class="table-header">
+                <div>Product Name</div>
+                <div>Is Additive</div>
+                <div>Arm No</div>
+                <div>Recipe Number</div>
+            </div>
+            <div class="table-body" id="bcuProdTableBody">
+                <div class="table-empty" id="bcuProdTableEmpty">Select a BCU to view products.</div>
+            </div>
+        </div>
+
+        <!-- Inline editor — kept in DOM, always hidden (replaced by modal) -->
+        <div class="bcu-prod-editor hidden" id="bcuProdEditor">
+            <div class="bcu-prod-editor-inner">
+                <input type="hidden" id="editBCUProductId" />
+                <label class="bcu-checkbox">
+                    <input type="checkbox" id="editIsAdditive" />
+                    <span class="bcu-checkmark"></span>
+                    Is Additive
+                </label>
+                <div class="form-group" style="flex-direction:row;align-items:center;gap:8px">
+                    <label style="white-space:nowrap;font-size:11px;color:rgba(255,255,255,0.65)">Recipe Number</label>
+                    <input type="number" id="editRecipeNo" placeholder="Recipe No" min="0"
+                           class="glass-input" style="width:100px;height:30px" />
+                </div>
+                <div class="form-group" style="flex-direction:row;align-items:center;gap:8px">
+                    <label style="white-space:nowrap;font-size:11px;color:rgba(255,255,255,0.65)">Arm No</label>
+                    <input type="number" id="editArmNo" placeholder="Arm No" min="0"
+                           class="glass-input" style="width:80px;height:30px" />
+                </div>
+                <button class="btn-primary" onclick="updateBCUProduct()">Update</button>
+                <button class="btn-secondary" onclick="closeProductEditor()">Cancel</button>
+            </div>
+        </div>
+
+    </div><!-- /#bcuProdTab -->
+    <!-- ===== BCU EDITOR MODAL ===== -->
+    <div class="bcum-backdrop" id="bcumBackdrop" onclick="closeBCUEditor()"></div>
+    <div class="bcum-modal" id="bcumModal">
+        <div class="bcum-header">
+            <div class="bcum-title">
+                <span class="bcum-icon">✎</span> Edit BCU
+            </div>
+            <button class="bcum-close" onclick="closeBCUEditor()">✕</button>
+        </div>
+        <div class="bcum-body">
+            <input type="hidden" id="editBCUId" />
+            <div class="form-row">
+                <div class="form-group">
+                    <label>BCU Name</label>
+                    <input type="text" id="editBCUName" class="glass-input"
+                           readonly style="opacity:0.55;cursor:default;" />
+                </div>
+                <div class="form-group">
+                    <label>BCU Number</label>
+                    <input type="number" id="editBCUNumber" class="glass-input" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>BCU Type</label>
+                    <div class="custom-select" id="editBCUTypeSelect">
+                        <div class="select-trigger"><span>Select Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editBCUTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bay</label>
+                    <div class="custom-select" id="editBCUBaySelect">
+                        <div class="select-trigger"><span>Select Bay</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editBCUBayDropdown"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Slave Address</label>
+                    <input type="number" id="editSlaveAddr" class="glass-input" />
+                </div>
+                <div class="form-group">
+                    <label>Secondary Slave Address</label>
+                    <input type="number" id="editRedSlaveAddr" class="glass-input" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Primary COM Port</label>
+                    <div class="custom-select" id="editBCUComPortSelect">
+                        <div class="select-trigger"><span>Select Port</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editBCUComPortDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Secondary COM Port</label>
+                    <div class="custom-select" id="editBCURedComPortSelect">
+                        <div class="select-trigger"><span>Select Port</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editBCURedComPortDropdown"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Arm Type</label>
+                    <div class="custom-select" id="editBCUArmTypeSelect">
+                        <div class="select-trigger"><span>Select Arm Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="editBCUArmTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Arm No</label>
+                    <input type="number" id="editBCUArmNo" class="glass-input" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex-direction:row;align-items:center;gap:20px;flex-wrap:wrap;">
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="editBCUCardReader" />
+                        <span class="bcu-checkmark"></span>
+                        Card Reader
+                    </label>
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="editBCUMFMStatus" />
+                        <span class="bcu-checkmark"></span>
+                        MFM Status
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div class="bcum-status-toggle" id="bcumStatusToggle" onclick="toggleBCUStatus()">
+                        <div class="bcum-dot" id="bcumStatusDot"></div>
+                        <span id="bcumStatusLabel">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bcum-footer">
+            <div style="flex:1"></div>
+            <button class="btn-secondary" onclick="closeBCUEditor()">Cancel</button>
+            <button class="btn-primary" onclick="updateBCUFromModal()">Update</button>
+        </div>
+    </div>
+
+    <!-- ===== BCU PRODUCT EDITOR MODAL ===== -->
+    <div class="bcum-backdrop" id="bcupBackdrop" onclick="closeProdModal()"></div>
+    <div class="bcum-modal" id="bcupModal">
+        <div class="bcum-header">
+            <div class="bcum-title">
+                <span class="bcum-icon">✎</span> Edit BCU Product
+            </div>
+            <button class="bcum-close" onclick="closeProdModal()">✕</button>
+        </div>
+        <div class="bcum-body">
+            <input type="hidden" id="modalBCUProductId" />
+            <!-- ROW 1: Product Name (full width) -->
+            <div class="form-row">
+                <div class="form-group" style="flex:1;">
+                    <label>Product Name</label>
+                    <input type="text" id="modalProductName" class="glass-input"
+                           readonly style="opacity:0.55;cursor:default;" />
+                </div>
+            </div>
+            <!-- ROW 2: Recipe Number + Arm No -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Recipe Number</label>
+                    <input type="number" id="modalRecipeNo" class="glass-input" min="0" />
+                </div>
+                <div class="form-group">
+                    <label>Arm No</label>
+                    <input type="number" id="modalArmNo" class="glass-input" min="0" />
+                </div>
+            </div>
+            <!-- ROW 3: Is Additive checkbox -->
+            <div class="form-row bcup-check-row">
+                <div class="form-group">
+                    <label class="bcu-checkbox">
+                        <input type="checkbox" id="modalIsAdditive" />
+                        <span class="bcu-checkmark"></span>
+                        Is Additive
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="bcum-footer">
+            <div style="flex:1"></div>
+            <button class="btn-secondary" onclick="closeProdModal()">Cancel</button>
+            <button class="btn-primary" onclick="submitProdModal()">Update</button>
+        </div>
+    </div>
+
+</div><!-- /.bay-module-card -->
+
+
+<style>
+    /* ===== BCU FORM FIXED GRID ===== */
+    .bcu-form {
+        width: 100%;
+        margin: auto;
+        overflow: visible !important;
+    }
+
+        .bcu-form .form-row + .form-row {
+            margin-top: 1px;
+        }
+
+        .bcu-form .form-row {
+            display: flex;
+            gap: 14px;
+        }
+
+        .bcu-form .form-group {
+            flex: 1;
+            min-width: 0;
+            position: relative;
+        }
+
+        .bcu-form .custom-select {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+            .bcu-form .custom-select.open {
+                z-index: 99999;
+                position: relative;
+            }
+
+        .bcu-form .select-dropdown {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            width: 100%;
+            max-height: 220px;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+            background: rgba(20,20,20,0.98);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            z-index: 99999;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            box-sizing: border-box;
+        }
+
+        .bcu-form .custom-select.open .select-dropdown {
+            display: block;
+        }
+
+        .bcu-form,
+        .bcu-form .form-row,
+        .bay-content,
+        .bay-module-card {
+            overflow: visible !important;
+        }
+
+            .bcu-form .form-group label {
+                font-size: 11px;
+                color: rgba(255,255,255,0.7);
+                margin-bottom: 5px;
+            }
+
+            .bcu-form .glass-input,
+            .bcu-form .select-trigger {
+                height: 38px;
+                width: 100%;
+                padding: 8px 12px;
+                border-radius: 8px;
+                border: 1px solid rgba(255,255,255,0.12);
+                background: rgba(255,255,255,0.04);
+                color: #fff;
+                font-size: 13px;
+                box-sizing: border-box;
+            }
+
+            .bcu-form .select-trigger {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+    .form-row {
+        align-items: start;
+    }
+
+    /* ===== LAST SECTION ===== */
+    .bcu-bottom {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: -10px;
+    }
+
+    .bcu-checks {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    /* ===== DROPDOWN ===== */
+    .custom-select {
+        position: relative;
+        width: 100%;
+    }
+
+    /* Default hidden state for ALL dropdowns not inside .bcu-form */
+    .select-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        width: 100%;
+        max-height: 220px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        background: rgba(20,20,20,0.98);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        z-index: 99999;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    .custom-select.open .select-dropdown {
+        display: block;
+    }
+
+    /* BCU Products top area must not clip the dropdown */
+    #bcuProdTab,
+    .bcu-prod-top {
+        overflow: visible !important;
+    }
+
+    /* ===== BCU TABLE ===== */
+    .bcu-table {
+        flex: 1;
+        min-height: 0;
+        margin-top: -10px;
+    }
+
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+
+    /* ── BCU Checks ── */
+    .bcu-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 12px;
+        color: rgba(255,255,255,0.72);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+        .bcu-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+    .bcu-checkmark {
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark {
+        background: #e10600;
+        border-color: #e10600;
+    }
+
+    .bcu-checkmark::after {
+        content: "✓";
+        font-size: 9px;
+        color: #fff;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark::after {
+        opacity: 1;
+    }
+
+    /* ── BCU table: 13 cols ── */
+    .bcu-table .table-header,
+    .bcu-table .table-row {
+        grid-template-columns: 1fr 60px 90px 1fr 90px 70px 90px 70px 80px 65px 90px 60px 60px;
+        font-size: 11px;
+    }
+
+    /* ── BCU Products tab ── */
+    .bcu-prod-top {
+        margin-bottom: 1px;
+        display: flex;
+        gap: 14px;
+    }
+
+    .bcu-prod-top .bcu-prod-selector {
+        flex: 0 0 calc((100% - 42px) / 4);
+        max-width: calc((100% - 42px) / 4);
+        min-width: 0;
+    }
+
+    #prodBcuSelect {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    #prodBcuSelect .select-trigger {
+        width: 100%;
+        height: 38px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 13px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    #prodBcuSelect .select-dropdown {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Constrained dual-list row */
+    .bcu-prod-body {
+        display: grid;
+        grid-template-columns: 1fr 60px 1fr;
+        gap: 16px;
+        margin-bottom: 26px;
+        flex-shrink: 0;
+        /* FIX: prevent expansion */
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+    }
+
+    /* Each panel */
+    .material-box {
+        height: 200px;
+        min-height: 200px;
+        max-height: 200px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Scrollable list inside panel */
+    .material-list {
+        flex: 1;
+        overflow-y: auto;
+        /* IMPORTANT: prevents stretch */
+        min-height: 0;
+    }
+
+    .bcu-prod-table .table-header,
+    .bcu-prod-table .table-row {
+        grid-template-columns: 1fr 100px 80px 120px;
+    }
+
+    /* Inline product editor (kept hidden — modal replaces it) */
+    .bcu-prod-editor {
+        border-top: 1px solid rgba(255,255,255,0.08);
+        padding-top: 12px;
+        margin-top: 8px;
+        flex-shrink: 0;
+    }
+
+    .bcu-prod-editor-inner {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    /* ── Row states ── */
+    .table-row {
+        cursor: pointer;
+    }
+
+        .table-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .table-row.bcu-selected {
+            background: rgba(225,6,0,0.07) !important;
+            border-left: 2px solid #e10600;
+        }
+
+    .table-empty {
+        padding: 28px;
+        text-align: center;
+        color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    /* bool cells */
+    .bcu-bool-yes {
+        color: #00ff9c;
+        font-size: 13px;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .bcu-bool-no {
+        color: rgba(255,255,255,0.18);
+        font-size: 13px;
+    }
+
+    /* product item in list */
+    .prod-item {
+        padding: 6px 10px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.85);
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+        .prod-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .prod-item.prod-selected {
+            background: rgba(225,6,0,0.12);
+            border: 1px solid rgba(225,6,0,0.35);
+        }
+
+    .btn-danger {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(225,6,0,0.38);
+        background: rgba(225,6,0,0.09);
+        color: #ff5555;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        transition: background 0.15s, border-color 0.15s;
+        position: relative;
+        z-index: 3;
+    }
+
+        .btn-danger:hover {
+            background: rgba(225,6,0,0.2);
+            border-color: #e10600;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.95);
+        }
+
+    /* ── BCU Editor Modal ── */
+    .bcum-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+        .bcum-backdrop.show {
+            opacity: 1;
+        }
+
+    .bcum-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -48%) scale(0.95);
+        width: min(600px, 90%);
+        background: linear-gradient(160deg, rgba(42,42,42,0.99) 0%, rgba(22,22,22,0.97) 100%);
+        border: 1px solid rgba(255,255,255,0.13);
+        border-radius: 14px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.2,.8,.2,1);
+    }
+
+        .bcum-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+    .bcum-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .bcum-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        letter-spacing: 0.4px;
+    }
+
+    .bcum-icon {
+        color: #e10600;
+        font-size: 15px;
+    }
+
+    .bcum-close {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.35);
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px 7px;
+        border-radius: 5px;
+        transition: color 0.15s, background 0.15s;
+        line-height: 1;
+    }
+
+        .bcum-close:hover {
+            color: #e10600;
+            background: rgba(225,6,0,0.1);
+        }
+
+    .bcum-body {
+        padding: 20px 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+        .bcum-body .form-row {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .bcum-body .form-group {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            gap: 0;
+        }
+
+            .bcum-body .form-group > label {
+                font-size: 11px;
+                color: rgba(255,255,255,0.55);
+                margin-bottom: 6px;
+                line-height: 1;
+                letter-spacing: 0.2px;
+            }
+
+        .bcum-body .glass-input {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box;
+            width: 100%;
+            line-height: 38px;
+        }
+
+        .bcum-body .select-trigger {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .bcum-body .form-row:last-child {
+            align-items: center;
+            min-height: 44px;
+        }
+
+            .bcum-body .form-row:last-child .form-group:first-child {
+                flex-direction: row;
+                align-items: center;
+                gap: 20px;
+                padding-top: 2px;
+            }
+
+            .bcum-body .form-row:last-child .form-group:last-child {
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+
+                .bcum-body .form-row:last-child .form-group:last-child > label {
+                    margin-bottom: 6px;
+                }
+
+    .bcum-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 20px 18px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    /* Status toggle */
+    .bcum-status-toggle {
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 14px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        cursor: pointer;
+        user-select: none;
+        color: rgba(255,255,255,0.85);
+        font-size: 12.5px;
+        transition: background 0.15s;
+        width: fit-content;
+        box-sizing: border-box;
+    }
+
+        .bcum-status-toggle:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+    .bcum-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #555;
+        transition: background 0.2s, box-shadow 0.2s;
+    }
+
+        .bcum-dot.active {
+            background: #00ff9c;
+            box-shadow: 0 0 6px rgba(0,255,150,0.6);
+        }
+
+        .bcum-dot.inactive {
+            background: #ffd600;
+            box-shadow: 0 0 6px rgba(255,214,0,0.5);
+        }
+
+    /* Dropdowns inside modals */
+    .bcum-body .custom-select {
+        position: relative;
+    }
+
+        .bcum-body .custom-select.open {
+            z-index: 9999;
+        }
+
+    .bcum-body .select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 180px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        z-index: 10000;
+        background: rgba(20,20,20,0.98);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+
+    /* ── BCU Product Editor Modal — alignment fixes ── */
+    #bcupModal .bcum-body .form-row {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    #bcupModal .bcum-body .form-group {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+        gap: 0;
+    }
+
+        #bcupModal .bcum-body .form-group > label:not(.bcu-checkbox) {
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 6px;
+            line-height: 1;
+            letter-spacing: 0.2px;
+        }
+
+    #bcupModal .bcum-body .glass-input {
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 13px;
+        box-sizing: border-box;
+        width: 100%;
+        line-height: 38px;
+    }
+
+    #bcupModal .bcum-body .glass-input:focus {
+        border: 1px solid rgba(255,0,0,0.6);
+        box-shadow: 0 0 6px rgba(255,0,0,0.3);
+        outline: none;
+    }
+
+    /* Checkbox row: vertically centered, no column layout */
+    #bcupModal .bcum-body .bcup-check-row {
+        align-items: center;
+        min-height: 38px;
+    }
+
+        #bcupModal .bcum-body .bcup-check-row .form-group {
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+</style>
+
+
+<script>
+
+    // ══════════════════════════════════════════════════════════════════════
+    // STATE
+    // Controller field reference:
+    //   GetAllProducts  → [{ id, name }]
+    //   GetBCUProducts  → [{ bcuProductId, productId, productName, isAdditive, bcuArmNo, bcuRecipeNo }]
+    //   GetBCUList      → [{ id, name }]
+    // ══════════════════════════════════════════════════════════════════════
+    let allBCUs         = [];
+    let bcuSelId        = null;
+    let bcuEditingId    = null;
+
+    let allProducts     = [];  // { id, name }
+    let assocProducts   = [];  // { bcuProductId, productId, productName, isAdditive, bcuArmNo, bcuRecipeNo }
+    let selectedAvailId = null; // stores p.id from allProducts
+    let selectedAssocId = null; // stores p.bcuProductId from assocProducts
+    let prodBcuId       = null;
+    let prodSelId       = null; // stores p.bcuProductId
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BOOT
+    // ══════════════════════════════════════════════════════════════════════
+    document.addEventListener("DOMContentLoaded", function () {
+        loadBCUDropdowns();
+        loadBCUTable();
+        wireTabs();
+        wireSelects();
+    });
+
+    // ══════════════════════════════════════════════════════════════════════
+    // TAB SWITCHING
+    // ══════════════════════════════════════════════════════════════════════
+    function wireTabs() {
+        document.getElementById("tabBCU").addEventListener("click", function () {
+            showTab("bcuTab");
+        });
+        document.getElementById("tabBCUProd").addEventListener("click", function () {
+            showTab("bcuProdTab");
+            loadProdBCUDropdown();
+        });
+    }
+
+    function showTab(tabId) {
+        document.querySelectorAll(".bcu-tab-content").forEach(t => t.classList.add("hidden"));
+        document.getElementById(tabId).classList.remove("hidden");
+        document.querySelectorAll(".bay-tab").forEach(t => t.classList.remove("active"));
+        if (tabId === "bcuTab") document.getElementById("tabBCU").classList.add("active");
+        else                    document.getElementById("tabBCUProd").classList.add("active");
+
+        const active = document.querySelector(".bay-tab.active");
+        const ind    = document.querySelector(".bay-indicator");
+        if (active && ind) {
+            const r  = active.getBoundingClientRect();
+            const pr = active.parentElement.getBoundingClientRect();
+            ind.style.width     = r.width + "px";
+            ind.style.transform = "translateX(" + (r.left - pr.left) + "px)";
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU TAB — DROPDOWNS
+    // ══════════════════════════════════════════════════════════════════════
+    function loadBCUDropdowns() {
+        fetchDrop("/BCU/GetBCUTypes", "bcuTypeDropdown");
+        fetchDrop("/BCU/GetBays",     "bcuBayDropdown");
+        fetchDrop("/BCU/GetComPorts", "bcuComPortDropdown");
+        fetchDrop("/BCU/GetComPorts", "bcuRedComPortDropdown");
+        fetchDrop("/BCU/GetArmTypes", "bcuArmTypeDropdown");
+    }
+
+    function fetchDrop(url, ddId) {
+        fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+            var el = document.getElementById(ddId);
+            if (el) el.innerHTML = data.map(function(d) {
+                return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+            }).join("");
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU TAB — TABLE
+    // ══════════════════════════════════════════════════════════════════════
+    function loadBCUTable() {
+        fetch("/BCU/GetBCUs")
+            .then(function(r) { return r.json(); })
+            .then(function(data) { allBCUs = data; renderBCUTable(data); })
+            .catch(function() {
+                var empty = document.getElementById("bcuTableEmpty");
+                if (empty) empty.textContent = "Failed to load.";
+            });
+    }
+
+    function renderBCUTable(list) {
+        var body  = document.getElementById("bcuTableBody");
+        var empty = document.getElementById("bcuTableEmpty");
+        if (!body) return;
+        if (!list || !list.length) {
+            body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "No records found."; }
+            return;
+        }
+        if (empty) empty.style.display = "none";
+        body.innerHTML = list.map(function(b) {
+            return '<div class="table-row ' + (b.bcuId === bcuSelId ? 'bcu-selected' : '') + '"' +
+                   ' data-id="' + b.bcuId + '"' +
+                   ' onclick="onBCURowClick(' + b.bcuId + ')"' +
+                   ' ondblclick="openBCUEditor(' + b.bcuId + ')">' +
+                   '<div>' + esc(b.bcuName) + '</div>' +
+                   '<div>' + b.bcuNumber + '</div>' +
+                   '<div>' + esc(b.bayName) + '</div>' +
+                   '<div>' + esc(b.bcuType) + '</div>' +
+                   '<div>' + esc(b.primaryComPort) + '</div>' +
+                   '<div>' + b.slaveAddress + '</div>' +
+                   '<div>' + esc(b.secondaryComPort) + '</div>' +
+                   '<div>' + (b.redundantSlaveAddress != null ? b.redundantSlaveAddress : '—') + '</div>' +
+                   '<div class="' + (b.isCardReaderIntegrated ? 'bcu-bool-yes' : 'bcu-bool-no') + '">' + (b.isCardReaderIntegrated ? '✔' : '—') + '</div>' +
+                   '<div class="' + (b.isActive ? 'bcu-bool-yes' : 'bcu-bool-no') + '">' + (b.isActive ? '✔' : '—') + '</div>' +
+                   '<div>' + esc(b.armType) + '</div>' +
+                   '<div>' + (b.armNo != null ? b.armNo : '—') + '</div>' +
+                   '<div class="' + (b.mfmStatus ? 'bcu-bool-yes' : 'bcu-bool-no') + '">' + (b.mfmStatus ? '✔' : '—') + '</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU TAB — ROW CLICK / SAVE / DELETE / CLEAR
+    // ══════════════════════════════════════════════════════════════════════
+    function onBCURowClick(id) {
+        if (bcuSelId === id) {
+            bcuSelId = null; bcuEditingId = null;
+            clearBCUForm();
+            document.querySelectorAll(".bcu-table .table-row").forEach(function(r) { r.classList.remove("bcu-selected"); });
+            return;
+        }
+        bcuSelId = id; bcuEditingId = id;
+        document.querySelectorAll(".bcu-table .table-row").forEach(function(r) {
+            r.classList.toggle("bcu-selected", parseInt(r.dataset.id) === id);
+        });
+        fetch("/BCU/GetBCUDetail/" + id).then(function(r) { return r.json(); }).then(function(d) {
+            document.getElementById("bcuName").value         = d.bcuName;
+            document.getElementById("bcuNumber").value       = d.bcuNumber;
+            document.getElementById("bcuSlaveAddr").value    = d.slaveAddress;
+            document.getElementById("bcuRedSlaveAddr").value = d.redundantSlaveAddress != null ? d.redundantSlaveAddress : "";
+            document.getElementById("bcuArmNo").value        = d.armNo != null ? d.armNo : "";
+            document.getElementById("bcuIsCardReader").checked = d.isCardReaderIntegrated;
+            document.getElementById("bcuIsActive").checked   = d.isActive;
+            document.getElementById("bcuMFMStatus").checked  = d.mfmStatus;
+            setDropValue("bcuTypeSelect",       d.bcuTypeId,          d.bcuTypeName);
+            setDropValue("bcuBaySelect",        d.bayId,              d.bayName);
+            setDropValue("bcuComPortSelect",    d.comPortId,          d.primaryComPort);
+            setDropValue("bcuRedComPortSelect", d.redundantComportId, d.secondaryComPort);
+            setDropValue("bcuArmTypeSelect",    d.armTypeId,          d.armType);
+        });
+    }
+
+    function saveBCU() {
+        var name    = document.getElementById("bcuName").value.trim();
+        var num     = parseInt(document.getElementById("bcuNumber").value) || 0;
+        var comPort = parseInt(document.getElementById("bcuComPortSelect").getAttribute("data-selected-id")) || 0;
+        var slave   = parseInt(document.getElementById("bcuSlaveAddr").value) || 0;
+
+        if (!name)    { alert("BCU Name is required.");         return; }
+        if (!num)     { alert("BCU Number is required.");       return; }
+        if (!comPort) { alert("Primary COM Port is required."); return; }
+
+        var payload = {
+            bcuId:                  bcuEditingId,
+            bcuName:                name,
+            bcuNumber:              num,
+            bcuTypeId:              parseInt(document.getElementById("bcuTypeSelect").getAttribute("data-selected-id"))       || null,
+            bayId:                  parseInt(document.getElementById("bcuBaySelect").getAttribute("data-selected-id"))        || null,
+            slaveAddress:           slave,
+            redundantSlaveAddress:  parseInt(document.getElementById("bcuRedSlaveAddr").value)                                || null,
+            comPortId:              comPort,
+            redundantComportId:     parseInt(document.getElementById("bcuRedComPortSelect").getAttribute("data-selected-id")) || null,
+            isCardReaderIntegrated: document.getElementById("bcuIsCardReader").checked,
+            isActive:               document.getElementById("bcuIsActive").checked,
+            isRIT:                  false,
+            mfmStatus:              document.getElementById("bcuMFMStatus").checked,
+            armTypeId:              parseInt(document.getElementById("bcuArmTypeSelect").getAttribute("data-selected-id"))    || null,
+            armNo:                  parseInt(document.getElementById("bcuArmNo").value) || null
+        };
+
+        fetch("/BCU/SaveBCU", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success) { clearBCUForm(); loadBCUTable(); }
+                else alert(res.message || "Save failed.");
+            });
+    }
+
+    function deleteBCU() {
+        if (!bcuSelId) { alert("Select a row first."); return; }
+        if (!confirm("Delete selected BCU?")) return;
+        fetch("/BCU/DeleteBCU", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(bcuSelId) })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success) { clearBCUForm(); loadBCUTable(); }
+                else alert(res.message || "Delete failed.");
+            });
+    }
+
+    function clearBCUForm() {
+        ["bcuName", "bcuNumber", "bcuSlaveAddr", "bcuRedSlaveAddr", "bcuArmNo"].forEach(function(id) {
+            var el = document.getElementById(id); if (el) el.value = "";
+        });
+        document.getElementById("bcuIsCardReader").checked = false;
+        document.getElementById("bcuIsActive").checked     = false;
+        document.getElementById("bcuMFMStatus").checked    = false;
+        ["bcuTypeSelect", "bcuBaySelect", "bcuComPortSelect", "bcuRedComPortSelect", "bcuArmTypeSelect"]
+            .forEach(function(id) { setDropValue(id, "", "Select"); });
+        bcuSelId = null; bcuEditingId = null;
+        document.querySelectorAll(".bcu-table .table-row").forEach(function(r) { r.classList.remove("bcu-selected"); });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — DROPDOWN LOAD
+    // Controller: GET /BCU/GetBCUList → [{ id, name }]
+    // ══════════════════════════════════════════════════════════════════════
+    function loadProdBCUDropdown() {
+        fetch("/BCU/GetBCUList")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var dd = document.getElementById("prodBcuDropdown");
+                if (!dd) return;
+                // Controller returns { id, name }
+                dd.innerHTML = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+            });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — MAIN LOAD (called when BCU selected from dropdown)
+    // Fetches BOTH endpoints in parallel via Promise.all — no race condition.
+    // GetAllProducts  → [{ id, name }]
+    // GetBCUProducts  → [{ bcuProductId, productId, productName, isAdditive, bcuArmNo, bcuRecipeNo }]
+    // ══════════════════════════════════════════════════════════════════════
+    function onProdBcuChange(bcuId) {
+        prodBcuId       = bcuId;
+        selectedAvailId = null;
+        selectedAssocId = null;
+        prodSelId       = null;
+
+        // Show loading state
+        var availEl = document.getElementById("availableProducts");
+        var assocEl = document.getElementById("associatedProducts");
+        if (availEl) availEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:12px">Loading...</div>';
+        if (assocEl) assocEl.innerHTML = '<div style="color:rgba(255,255,255,0.3);font-size:12px;padding:12px">Loading...</div>';
+
+        Promise.all([
+            fetch("/BCU/GetAllProducts").then(function(r) { return r.json(); }),
+            fetch("/BCU/GetBCUProducts?bcuId=" + bcuId).then(function(r) { return r.json(); })
+        ])
+        .then(function(results) {
+            allProducts   = results[0]; // [{ id, name }] — already excludes deleted (controller filters)
+            // Exclude associated products whose underlying product has been deleted.
+            // A product is deleted if its productId is no longer in the clean allProducts list.
+            var activeIds = allProducts.map(function(p) { return p.id; });
+            assocProducts = results[1].filter(function(p) { return activeIds.indexOf(p.productId) !== -1; });
+            renderAvailableList();
+            renderAssociatedList();
+            renderProductTable();
+        })
+        .catch(function(err) {
+            var msg = err ? err.message || String(err) : "Unknown error";
+            var failHtml = '<div style="color:#ff5555;font-size:12px;padding:12px">Failed to load: ' + msg + '</div>';
+            var ae = document.getElementById("availableProducts");
+            var as2 = document.getElementById("associatedProducts");
+            if (ae) ae.innerHTML = failHtml;
+            if (as2) as2.innerHTML = failHtml;
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — RENDER FUNCTIONS
+    // ══════════════════════════════════════════════════════════════════════
+
+    function renderAvailableList() {
+        var el = document.getElementById("availableProducts");
+        if (!el) return;
+        // assocProducts has productId field; allProducts has id field
+        var assocIds = assocProducts.map(function(p) { return p.productId; });
+        var avail    = allProducts.filter(function(p) { return assocIds.indexOf(p.id) === -1; });
+        if (!avail.length) {
+            el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">No available products</div>';
+            return;
+        }
+        el.innerHTML = avail.map(function(p) {
+            var sel = selectedAvailId === p.id ? ' prod-selected' : '';
+            return '<div class="prod-item' + sel + '" data-id="' + p.id + '" onclick="selectAvail(' + p.id + ')">' + esc(p.name) + '</div>';
+        }).join("");
+    }
+
+    function renderAssociatedList() {
+        var el = document.getElementById("associatedProducts");
+        if (!el) return;
+        if (!assocProducts.length) {
+            el.innerHTML = '<div style="color:rgba(255,255,255,0.25);font-size:12px;padding:12px">None associated</div>';
+            return;
+        }
+        el.innerHTML = assocProducts.map(function(p) {
+            var sel = selectedAssocId === p.bcuProductId ? ' prod-selected' : '';
+            return '<div class="prod-item' + sel + '" data-id="' + p.bcuProductId + '" onclick="selectAssoc(' + p.bcuProductId + ')">' + esc(p.productName) + '</div>';
+        }).join("");
+    }
+
+    function renderProductTable() {
+        var body  = document.getElementById("bcuProdTableBody");
+        var empty = document.getElementById("bcuProdTableEmpty");
+        if (!body) return;
+        if (!assocProducts.length) {
+            body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "No products associated."; }
+            return;
+        }
+        if (empty) empty.style.display = "none";
+        body.innerHTML = assocProducts.map(function(p) {
+            var sel = p.bcuProductId === prodSelId ? ' bcu-selected' : '';
+            return '<div class="table-row' + sel + '" data-id="' + p.bcuProductId + '"' +
+                   ' onclick="onProdRowClick(' + p.bcuProductId + ')"' +
+                   ' ondblclick="onProdRowDblClick(' + p.bcuProductId + ')">' +
+                   '<div>' + esc(p.productName) + '</div>' +
+                   '<div class="' + (p.isAdditive ? 'bcu-bool-yes' : 'bcu-bool-no') + '">' + (p.isAdditive ? '✔' : '—') + '</div>' +
+                   '<div>' + p.bcuArmNo + '</div>' +
+                   '<div>' + (p.bcuRecipeNo != null ? p.bcuRecipeNo : '—') + '</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — LIST SELECTION
+    // ══════════════════════════════════════════════════════════════════════
+    function selectAvail(id) {
+        selectedAvailId = id;
+        selectedAssocId = null;
+        renderAvailableList();
+        renderAssociatedList();
+    }
+
+    function selectAssoc(id) {
+        selectedAssocId = id;
+        selectedAvailId = null;
+        renderAssociatedList();
+        renderAvailableList();
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — ADD / REMOVE
+    // ══════════════════════════════════════════════════════════════════════
+    function addProduct() {
+        if (!prodBcuId)       { alert("Select a BCU first.");      return; }
+        if (!selectedAvailId) { alert("Select a product to add."); return; }
+        fetch("/BCU/AddBCUProduct", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bcuId: prodBcuId, productId: selectedAvailId, isAdditive: false, bcuArmNo: 0, bcuRecipeNo: null })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { selectedAvailId = null; refreshProdData(); }
+            else alert(res.message || "Add failed.");
+        });
+    }
+
+    function removeProduct() {
+        if (!selectedAssocId) { alert("Select an associated product to remove."); return; }
+        if (!confirm("Remove this product from BCU?")) return;
+        fetch("/BCU/RemoveBCUProduct", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(selectedAssocId)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { selectedAssocId = null; refreshProdData(); }
+            else alert(res.message || "Remove failed.");
+        });
+    }
+
+    // Central refresh after add / remove / update
+    function refreshProdData() {
+        if (!prodBcuId) return;
+        Promise.all([
+            fetch("/BCU/GetAllProducts").then(function(r) { return r.json(); }),
+            fetch("/BCU/GetBCUProducts?bcuId=" + prodBcuId).then(function(r) { return r.json(); })
+        ])
+        .then(function(results) {
+            allProducts   = results[0];
+            var activeIds = allProducts.map(function(p) { return p.id; });
+            assocProducts = results[1].filter(function(p) { return activeIds.indexOf(p.productId) !== -1; });
+            renderAvailableList();
+            renderAssociatedList();
+            renderProductTable();
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCTS TAB — TABLE ROW CLICK / DBLCLICK
+    // ══════════════════════════════════════════════════════════════════════
+    function onProdRowClick(id) {
+        prodSelId = (prodSelId === id) ? null : id;
+        renderProductTable();
+    }
+
+    function onProdRowDblClick(id) {
+        var prod = assocProducts.find(function(p) { return p.bcuProductId === id; });
+        if (!prod) return;
+        document.getElementById("modalBCUProductId").value = prod.bcuProductId;
+        document.getElementById("modalProductName").value  = prod.productName;
+        document.getElementById("modalIsAdditive").checked = prod.isAdditive;
+        document.getElementById("modalRecipeNo").value     = prod.bcuRecipeNo != null ? prod.bcuRecipeNo : "";
+        document.getElementById("modalArmNo").value        = prod.bcuArmNo;
+        var modal = document.getElementById("bcupModal");
+        var back  = document.getElementById("bcupBackdrop");
+        modal.style.display = "block";
+        back.style.display  = "block";
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+            modal.classList.add("show");
+            back.classList.add("show");
+        }); });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU PRODUCT EDITOR MODAL
+    // ══════════════════════════════════════════════════════════════════════
+    function closeProdModal() {
+        var modal = document.getElementById("bcupModal");
+        var back  = document.getElementById("bcupBackdrop");
+        modal.classList.remove("show");
+        back.classList.remove("show");
+        setTimeout(function() { modal.style.display = "none"; back.style.display = "none"; }, 220);
+    }
+
+    function submitProdModal() {
+        var id     = parseInt(document.getElementById("modalBCUProductId").value);
+        var isAdd  = document.getElementById("modalIsAdditive").checked;
+        var recipe = parseInt(document.getElementById("modalRecipeNo").value) || null;
+        var arm    = parseInt(document.getElementById("modalArmNo").value)    || 0;
+        fetch("/BCU/UpdateBCUProduct", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ bcuProductId: id, isAdditive: isAdd, bcuArmNo: arm, bcuRecipeNo: recipe })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { prodSelId = null; closeProdModal(); refreshProdData(); }
+            else alert(res.message || "Update failed.");
+        });
+    }
+
+    // Stubs so legacy inline HTML handlers don't crash
+    function closeProductEditor() { closeProdModal(); }
+    function updateBCUProduct()   { submitProdModal(); }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SHARED — wireSelects
+    // Uses event delegation on document. Options use mousedown so selection
+    // fires BEFORE the blur/click-outside handler can close the dropdown.
+    // ══════════════════════════════════════════════════════════════════════
+    function wireSelects() {
+
+        // Open/close dropdown on trigger click
+        document.addEventListener("click", function(e) {
+            var trigger = e.target.closest(".select-trigger");
+            if (trigger) {
+                e.stopPropagation();
+                var sel = trigger.closest(".custom-select");
+                var isOpen = sel.classList.contains("open");
+                // Close all
+                document.querySelectorAll(".custom-select.open").forEach(function(s) {
+                    s.classList.remove("open");
+                });
+                // Toggle this one
+                if (!isOpen) sel.classList.add("open");
+                return;
+            }
+            // Click outside — close all
+            if (!e.target.closest(".custom-select")) {
+                document.querySelectorAll(".custom-select.open").forEach(function(s) {
+                    s.classList.remove("open");
+                });
+            }
+        });
+
+        // Option selection uses mousedown — fires before the document click handler
+        document.addEventListener("mousedown", function(e) {
+            var opt = e.target.closest(".option");
+            if (!opt) return;
+
+            e.preventDefault();  // prevent focus change that would trigger document click
+            e.stopPropagation();
+
+            var sel = opt.closest(".custom-select");
+            if (!sel) return;
+
+            // Set label and value
+            var span = sel.querySelector(".select-trigger span");
+            if (span) span.textContent = opt.textContent.trim();
+            sel.setAttribute("data-selected-id", opt.dataset.id || "");
+            sel.classList.remove("open");
+
+            // BCU Products dropdown — trigger data load immediately
+            if (sel.id === "prodBcuSelect") {
+                var bcuId = parseInt(opt.dataset.id);
+                if (bcuId) {
+                    onProdBcuChange(bcuId);
+                }
+            }
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // SHARED — helpers
+    // ══════════════════════════════════════════════════════════════════════
+    function setDropValue(selId, id, label) {
+        var sel = document.getElementById(selId);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", id != null ? id : "");
+        var sp = sel.querySelector(".select-trigger span");
+        if (sp) sp.textContent = label || "Select";
+    }
+
+    function getDropValue(id) {
+        return parseInt(document.getElementById(id) && document.getElementById(id).getAttribute("data-selected-id")) || null;
+    }
+
+    function esc(s) {
+        if (s == null && s !== 0) return "";
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    function copyDropdownItems(sourceId, targetId) {
+        var src = document.getElementById(sourceId);
+        var tgt = document.getElementById(targetId);
+        if (src && tgt) tgt.innerHTML = src.innerHTML;
+    }
+
+    // ══════════════════════════════════════════════════════════════════════
+    // BCU EDITOR MODAL (double-click on BCU table row)
+    // ══════════════════════════════════════════════════════════════════════
+    var editBCUIsActive = true;
+
+    function openBCUEditor(id) {
+        fetch("/BCU/GetBCUDetail/" + id)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                document.getElementById("editBCUId").value           = d.bcuId;
+                document.getElementById("editBCUName").value         = d.bcuName;
+                document.getElementById("editBCUNumber").value       = d.bcuNumber;
+                document.getElementById("editSlaveAddr").value       = d.slaveAddress;
+                document.getElementById("editRedSlaveAddr").value    = d.redundantSlaveAddress != null ? d.redundantSlaveAddress : "";
+                document.getElementById("editBCUArmNo").value        = d.armNo != null ? d.armNo : "";
+                document.getElementById("editBCUCardReader").checked = d.isCardReaderIntegrated;
+                document.getElementById("editBCUMFMStatus").checked  = d.mfmStatus;
+
+                copyDropdownItems("bcuTypeDropdown",       "editBCUTypeDropdown");
+                copyDropdownItems("bcuBayDropdown",        "editBCUBayDropdown");
+                copyDropdownItems("bcuComPortDropdown",    "editBCUComPortDropdown");
+                copyDropdownItems("bcuRedComPortDropdown", "editBCURedComPortDropdown");
+                copyDropdownItems("bcuArmTypeDropdown",    "editBCUArmTypeDropdown");
+
+                setDropValue("editBCUTypeSelect",       d.bcuTypeId,           d.bcuTypeName      || "Select Type");
+                setDropValue("editBCUBaySelect",        d.bayId,               d.bayName          || "Select Bay");
+                setDropValue("editBCUComPortSelect",    d.comPortId,           d.primaryComPort   || "Select Port");
+                setDropValue("editBCURedComPortSelect", d.redundantComportId,  d.secondaryComPort || "Select Port");
+                setDropValue("editBCUArmTypeSelect",    d.armTypeId,           d.armType          || "Select Arm Type");
+
+                editBCUIsActive = d.isActive;
+                updateBCUStatusUI();
+
+                document.querySelectorAll(".bcu-table .table-row").forEach(function(r) {
+                    r.classList.toggle("bcu-selected", parseInt(r.dataset.id) === id);
+                });
+
+                var modal = document.getElementById("bcumModal");
+                var back  = document.getElementById("bcumBackdrop");
+                modal.style.display = "block";
+                back.style.display  = "block";
+                requestAnimationFrame(function() { requestAnimationFrame(function() {
+                    modal.classList.add("show");
+                    back.classList.add("show");
+                }); });
+            });
+    }
+
+    function closeBCUEditor() {
+        var modal = document.getElementById("bcumModal");
+        var back  = document.getElementById("bcumBackdrop");
+        modal.classList.remove("show");
+        back.classList.remove("show");
+        setTimeout(function() { modal.style.display = "none"; back.style.display = "none"; }, 220);
+        document.querySelectorAll(".bcu-table .table-row").forEach(function(r) { r.classList.remove("bcu-selected"); });
+        bcuSelId = null;
+    }
+
+    function toggleBCUStatus() {
+        editBCUIsActive = !editBCUIsActive;
+        updateBCUStatusUI();
+    }
+
+    function updateBCUStatusUI() {
+        var label = document.getElementById("bcumStatusLabel");
+        var dot   = document.getElementById("bcumStatusDot");
+        if (label) label.textContent = editBCUIsActive ? "Active" : "Inactive";
+        if (dot)   dot.className     = "bcum-dot " + (editBCUIsActive ? "active" : "inactive");
+    }
+
+    function updateBCUFromModal() {
+        var id = document.getElementById("editBCUId").value;
+        var payload = {
+            bcuId:                  id,
+            bcuName:                document.getElementById("editBCUName").value,
+            bcuNumber:              parseInt(document.getElementById("editBCUNumber").value) || 0,
+            bcuTypeId:              getDropValue("editBCUTypeSelect"),
+            bayId:                  getDropValue("editBCUBaySelect"),
+            slaveAddress:           parseInt(document.getElementById("editSlaveAddr").value)    || 0,
+            redundantSlaveAddress:  parseInt(document.getElementById("editRedSlaveAddr").value) || null,
+            comPortId:              getDropValue("editBCUComPortSelect"),
+            redundantComportId:     getDropValue("editBCURedComPortSelect"),
+            armTypeId:              getDropValue("editBCUArmTypeSelect"),
+            armNo:                  parseInt(document.getElementById("editBCUArmNo").value) || null,
+            isCardReaderIntegrated: document.getElementById("editBCUCardReader").checked,
+            mfmStatus:              document.getElementById("editBCUMFMStatus").checked,
+            isActive:               editBCUIsActive
+        };
+        fetch("/BCU/SaveBCU", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (res.success) {
+                    bcuSelId = null; bcuEditingId = null;
+                    clearBCUForm();
+                    closeBCUEditor();
+                    loadBCUTable();
+                } else {
+                    alert(res.message || "Update failed.");
+                }
+            });
+    }
+
+</script>

@@ -1,0 +1,1342 @@
+﻿@{
+    ViewBag.Title = "Products";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="bay-module-card">
+
+    <!-- ═══════════════════════════════════════════
+         FORM SECTION
+    ═══════════════════════════════════════════ -->
+    <div class="prod-form bay-form">
+
+        <div class="prod-three-col">
+
+            <!-- ROW 1: Groups + Codes -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Group Name</label>
+                    <div class="custom-select" id="groupNameSelect">
+                        <div class="select-trigger"><span>Select</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="groupNameDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Blended Group Name</label>
+                    <div class="custom-select" id="blendGroupSelect">
+                        <div class="select-trigger"><span>Select</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="blendGroupDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Material Code<span class="req">*</span></label>
+                    <input type="text" id="prodCode" class="glass-input" maxlength="20" />
+                </div>
+                <div class="form-group">
+                    <label>ERP Material Code<span class="req">*</span></label>
+                    <input type="text" id="prodERPCode" class="glass-input" maxlength="20" />
+                </div>
+            </div>
+
+            <!-- ROW 2: Name + Desc + Color + Checks -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Material Name<span class="req">*</span></label>
+                    <input type="text" id="prodName" class="glass-input" maxlength="50" />
+                </div>
+                <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" id="prodDesc" class="glass-input" maxlength="50" />
+                </div>
+                <div class="form-group prod-col-color">
+                    <label>Material Color</label>
+                    <div class="custom-select" id="colorSelect">
+                        <div class="select-trigger">
+                            <span class="color-trigger-inner">
+                                <span class="color-dot-preview" id="colorDotPreview"></span>
+                                <span id="colorSelectLabel">White</span>
+                            </span>
+                            <div class="arrow"></div>
+                        </div>
+                        <div class="select-dropdown" id="colorDropdown">
+                            <div class="option" data-id="" data-color=""><span class="color-dot-opt" style="background:#fff;border:1px solid #555;"></span>White</div>
+                            <div class="option" data-id="#FFA500" data-color="#FFA500"><span class="color-dot-opt" style="background:#FFA500;"></span>Orange</div>
+                            <div class="option" data-id="#FF4444" data-color="#FF4444"><span class="color-dot-opt" style="background:#FF4444;"></span>Red</div>
+                            <div class="option" data-id="#4488FF" data-color="#4488FF"><span class="color-dot-opt" style="background:#4488FF;"></span>Blue</div>
+                            <div class="option" data-id="#44BB66" data-color="#44BB66"><span class="color-dot-opt" style="background:#44BB66;"></span>Green</div>
+                            <div class="option" data-id="#FFD600" data-color="#FFD600"><span class="color-dot-opt" style="background:#FFD600;"></span>Yellow</div>
+                            <div class="option" data-id="#AA44CC" data-color="#AA44CC"><span class="color-dot-opt" style="background:#AA44CC;"></span>Purple</div>
+                            <div class="option" data-id="#FF6600" data-color="#FF6600"><span class="color-dot-opt" style="background:#FF6600;"></span>Dark Orange</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group prod-col-checks">
+                    <label>&nbsp;</label>
+                    <div class="prod-check-row">
+                        <label class="bcu-checkbox">
+                            <input type="checkbox" id="chkWeighing" />
+                            <span class="bcu-checkmark"></span>
+                            IsWeighingRequired
+                        </label>
+                        <label class="bcu-checkbox">
+                            <input type="checkbox" id="chkActive" />
+                            <span class="bcu-checkmark"></span>
+                            IsActive
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3: Density & Ratio — single section label, single row -->
+            <div class="prod-section-label">Density &amp; Ratio</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Density Max</label>
+                    <input type="number" id="densityMax" class="glass-input" step="0.00001" />
+                </div>
+                <div class="form-group">
+                    <label>Density Min</label>
+                    <input type="number" id="densityMin" class="glass-input" step="0.00001" />
+                </div>
+                <div class="form-group">
+                    <label>Density Tolerance</label>
+                    <input type="number" id="densityTol" class="glass-input" step="0.00001" />
+                </div>
+                <div class="prod-section-sep"></div>
+                <div class="form-group">
+                    <label>Proportion A</label>
+                    <input type="number" id="proportionA" class="glass-input" step="0.01" />
+                </div>
+                <div class="form-group">
+                    <label>Proportion B</label>
+                    <input type="number" id="proportionB" class="glass-input" step="0.01" />
+                </div>
+            </div>
+
+            <!-- ROW 4: Temperature — inline with action buttons -->
+            <div class="prod-section-label">Temperature</div>
+            <div class="prod-bottom-row">
+                <div class="prod-temp-fields">
+                    <div class="form-group">
+                        <label>Temp Max</label>
+                        <input type="number" id="tempMax" class="glass-input" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Temp Min</label>
+                        <input type="number" id="tempMin" class="glass-input" step="0.01" />
+                    </div>
+                    <div class="form-group">
+                        <label>Temp Tolerance</label>
+                        <input type="number" id="tempTol" class="glass-input" step="0.01" />
+                    </div>
+                </div>
+                <div class="prod-action-col">
+                    <button class="btn-primary" onclick="saveProduct()">Save</button>
+                    <button class="btn-secondary" onclick="clearProductForm()">Clear</button>
+                    <button class="btn-danger" onclick="deleteProduct()" id="btnDeleteProd">Delete</button>
+                </div>
+            </div>
+
+        </div><!-- /.prod-three-col -->
+
+    </div><!-- /.prod-form -->
+
+    <!-- ═══════════════════════════════════════════
+         TABLE SECTION
+    ═══════════════════════════════════════════ -->
+    <div class="prod-table-wrapper">
+        <div class="bay-table prod-table">
+        <div class="table-header">
+            <div>Material Code</div>
+            <div>ERP Material Code</div>
+            <div>Material Name</div>
+            <div>Description</div>
+            <div>Color</div>
+            <div>IsWeighingRequired</div>
+            <div>IsActive</div>
+            <div>Propotion A</div>
+            <div>Propotion B</div>
+            <div>Group Name</div>
+            <div>Blended Group Name</div>
+            <div>MinDensity</div>
+            <div>MaxDensity</div>
+            <div>Tol Density</div>
+            <div>MinTemp</div>
+            <div>MaxTemp</div>
+            <div>Tol Temp</div>
+        </div>
+        <div class="table-body" id="prodTableBody">
+            <div class="table-empty" id="prodTableEmpty">Loading...</div>
+        </div>
+    </div>
+    </div><!-- /prod-table-wrapper -->
+</div><!-- /.bay-module-card -->
+
+
+<!-- ═══════════════════════════════════════════
+     EDIT MODAL
+═══════════════════════════════════════════ -->
+<div class="bcum-backdrop" id="prodBackdrop" onclick="closeProdModal()"></div>
+<div class="bcum-modal prod-modal-wide" id="prodModal">
+    <div class="bcum-header">
+        <div class="bcum-title">
+            <span class="bcum-icon">&#9998;</span> Edit Product
+        </div>
+        <button class="bcum-close" onclick="closeProdModal()">&#10005;</button>
+    </div>
+    <div class="bcum-body">
+        <input type="hidden" id="editProdId" />
+
+        <!-- ROW 1 -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Material Code</label>
+                <input type="text" id="editProdCode" class="glass-input" maxlength="20" />
+            </div>
+            <div class="form-group">
+                <label>ERP Material Code</label>
+                <input type="text" id="editProdERPCode" class="glass-input" maxlength="20" />
+            </div>
+            <div class="form-group">
+                <label>Material Name</label>
+                <input type="text" id="editProdName" class="glass-input" maxlength="50" />
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <input type="text" id="editProdDesc" class="glass-input" maxlength="50" />
+            </div>
+        </div>
+
+        <!-- ROW 2 -->
+        <div class="form-row">
+            <div class="form-group">
+                <label>Group Name</label>
+                <div class="custom-select" id="editGroupSelect">
+                    <div class="select-trigger"><span>Select</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="editGroupDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Blended Group Name</label>
+                <div class="custom-select" id="editBlendGroupSelect">
+                    <div class="select-trigger"><span>Select</span><div class="arrow"></div></div>
+                    <div class="select-dropdown" id="editBlendGroupDropdown"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Material Color</label>
+                <div class="custom-select" id="editColorSelect">
+                    <div class="select-trigger">
+                        <span class="color-trigger-inner">
+                            <span class="color-dot-preview" id="editColorDotPreview"></span>
+                            <span id="editColorSelectLabel">White</span>
+                        </span>
+                        <div class="arrow"></div>
+                    </div>
+                    <div class="select-dropdown" id="editColorDropdown">
+                        <div class="option" data-id="" data-color=""><span class="color-dot-opt" style="background:#fff;border:1px solid #555;"></span>White</div>
+                        <div class="option" data-id="#FFA500" data-color="#FFA500"><span class="color-dot-opt" style="background:#FFA500;"></span>Orange</div>
+                        <div class="option" data-id="#FF4444" data-color="#FF4444"><span class="color-dot-opt" style="background:#FF4444;"></span>Red</div>
+                        <div class="option" data-id="#4488FF" data-color="#4488FF"><span class="color-dot-opt" style="background:#4488FF;"></span>Blue</div>
+                        <div class="option" data-id="#44BB66" data-color="#44BB66"><span class="color-dot-opt" style="background:#44BB66;"></span>Green</div>
+                        <div class="option" data-id="#FFD600" data-color="#FFD600"><span class="color-dot-opt" style="background:#FFD600;"></span>Yellow</div>
+                        <div class="option" data-id="#AA44CC" data-color="#AA44CC"><span class="color-dot-opt" style="background:#AA44CC;"></span>Purple</div>
+                        <div class="option" data-id="#FF6600" data-color="#FF6600"><span class="color-dot-opt" style="background:#FF6600;"></span>Dark Orange</div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group" style="flex-direction:row;align-items:flex-end;gap:18px;padding-bottom:2px;">
+                <label class="bcu-checkbox">
+                    <input type="checkbox" id="editChkWeighing" />
+                    <span class="bcu-checkmark"></span>
+                    IsWeighingRequired
+                </label>
+                <label class="bcu-checkbox">
+                    <input type="checkbox" id="editChkActive" />
+                    <span class="bcu-checkmark"></span>
+                    IsActive
+                </label>
+            </div>
+        </div>
+
+        <!-- ROW 3: Density -->
+        <div class="prod-modal-section-label">Density</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Maximum</label>
+                <input type="number" id="editDensityMax" class="glass-input" step="0.00001" />
+            </div>
+            <div class="form-group">
+                <label>Minimum</label>
+                <input type="number" id="editDensityMin" class="glass-input" step="0.00001" />
+            </div>
+            <div class="form-group">
+                <label>Tolerance</label>
+                <input type="number" id="editDensityTol" class="glass-input" step="0.00001" />
+            </div>
+            <div class="form-group">
+                <label>Proportion A</label>
+                <input type="number" id="editProportionA" class="glass-input" step="0.01" />
+            </div>
+            <div class="form-group">
+                <label>Proportion B</label>
+                <input type="number" id="editProportionB" class="glass-input" step="0.01" />
+            </div>
+        </div>
+
+        <!-- ROW 4: Temperature -->
+        <div class="prod-modal-section-label">Temperature</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Maximum</label>
+                <input type="number" id="editTempMax" class="glass-input" step="0.01" />
+            </div>
+            <div class="form-group">
+                <label>Minimum</label>
+                <input type="number" id="editTempMin" class="glass-input" step="0.01" />
+            </div>
+            <div class="form-group">
+                <label>Tolerance</label>
+                <input type="number" id="editTempTol" class="glass-input" step="0.01" />
+            </div>
+        </div>
+
+    </div><!-- /.bcum-body -->
+    <div class="bcum-footer">
+        <div style="flex:1;"></div>
+        <button class="btn-secondary" onclick="closeProdModal()">Cancel</button>
+        <button class="btn-primary"   onclick="updateProductFromModal()">Update</button>
+    </div>
+</div><!-- /#prodModal -->
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE-SCOPED STYLES
+═══════════════════════════════════════════ -->
+<style>
+
+    /* ══════════════════════════════════════════
+           FORM LAYOUT
+        ══════════════════════════════════════════ */
+
+    .prod-form {
+        width: 100%;
+        overflow: visible !important;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .prod-three-col {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    .prod-col-left,
+    .prod-col-mid,
+    .prod-col-right {
+        display: contents;
+    }
+
+    /* ── Section labels ── */
+    .prod-section-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.28);
+        display: flex;
+        align-items: flex-end;
+        height: auto;
+        margin: 6px 0 4px;
+        padding-bottom: 4px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .prod-form .form-row {
+        align-items: flex-start;
+    }
+    /* ── Form rows ── */
+    .prod-form .form-row,
+    .prod-form .form-row.two {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        margin-bottom: 10px;
+        overflow: visible !important;
+    }
+
+    /* ── Form group ── */
+    .prod-form .form-group {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: visible !important;
+    }
+
+        .prod-form .form-group > label:not(.bcu-checkbox) {
+            font-size: 10.5px;
+            color: rgba(255,255,255,0.50);
+            margin-bottom: 5px;
+            line-height: 1;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+    /* ── Inputs ── */
+    .prod-form .glass-input {
+        height: 34px;
+        width: 100%;
+        padding: 0 10px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,0.09);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12.5px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+        .prod-form .glass-input:focus {
+            border-color: rgba(225,6,0,0.45);
+            box-shadow: 0 0 0 2px rgba(225,6,0,0.1);
+        }
+
+    /* ── Select trigger ── */
+    .prod-form .select-trigger {
+        height: 34px;
+        width: 100%;
+        padding: 0 10px;
+        border-radius: 7px;
+        border: 1px solid rgba(255,255,255,0.09);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12.5px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        transition: border-color 0.15s;
+    }
+
+        .prod-form .select-trigger:hover {
+            border-color: rgba(255,255,255,0.18);
+        }
+
+    /* ── Custom select ── */
+    .prod-form .custom-select {
+        position: relative;
+        width: 100%;
+    }
+
+        .prod-form .custom-select.open {
+            z-index: 9999;
+        }
+
+    .prod-form .select-dropdown {
+        display: none;
+        position: absolute;
+        top: calc(100% + 3px);
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        background: rgba(18,18,18,0.99);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 8px;
+        z-index: 99999;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+        box-sizing: border-box;
+    }
+
+    .prod-form .custom-select.open .select-dropdown {
+        display: block;
+    }
+
+    /* overflow visible everywhere */
+    .prod-form, .prod-form .form-row, .prod-three-col,
+    .prod-col-left, .prod-col-mid, .prod-col-right,
+    .bay-module-card, .prod-form .form-group {
+        overflow: visible !important;
+    }
+
+    /* ── Checkboxes — EXACT BCU style ── */
+    .prod-check-row {
+        display: flex;
+        flex-direction: row;
+        gap: 16px;
+        align-items: center;
+        height: 34px;
+    }
+
+    /* ── Color dot ── */
+    .color-trigger-inner {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .color-dot-preview {
+        width: 11px;
+        height: 11px;
+        border-radius: 3px;
+        flex-shrink: 0;
+        display: inline-block;
+        background: #fff;
+        border: 1px solid #555;
+    }
+
+    .color-dot-opt {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 3px;
+        margin-right: 7px;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+
+    /* ── Dropdown options ── */
+    .prod-form .select-dropdown .option,
+    .bcum-body .select-dropdown .option {
+        display: flex;
+        align-items: center;
+        padding: 7px 12px;
+        font-size: 12px;
+        color: rgba(255,255,255,0.8);
+        cursor: pointer;
+        transition: background 0.1s;
+    }
+
+        .prod-form .select-dropdown .option:hover,
+        .bcum-body .select-dropdown .option:hover {
+            background: rgba(255,255,255,0.07);
+        }
+
+    /* ── Arrow ── */
+    .prod-form .select-trigger .arrow,
+    .bcum-body .select-trigger .arrow {
+        width: 0;
+        height: 0;
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        border-top: 5px solid rgba(255,255,255,0.3);
+        flex-shrink: 0;
+    }
+
+    /* ── Sizing helpers ── */
+    .prod-col-color {
+        flex: 0 0 160px;
+    }
+
+    .prod-col-checks {
+        flex: 0 0 auto;
+    }
+
+    /* ── Vertical separator ── */
+    .prod-section-sep {
+        width: 1px;
+        background: rgba(255,255,255,0.07);
+        align-self: stretch;
+        flex-shrink: 0;
+        margin: 0 8px;
+    }
+
+    /* ── Actions bar — sits beside Temperature row ── */
+    .prod-bottom-row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+        margin-bottom: 10px;
+    }
+
+    .prod-temp-fields {
+        display: flex;
+        gap: 12px;
+        flex: 1;
+        align-items: flex-end;
+    }
+
+        .prod-temp-fields .form-group {
+            flex: 1;
+            min-width: 0;
+        }
+
+    .prod-action-col {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+        padding-bottom: 0;
+        flex-shrink: 0;
+    }
+
+    /* ── BCU-style checkbox ── */
+    .bcu-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 12px;
+        color: rgba(255,255,255,0.72);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+        .bcu-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+    .bcu-checkmark {
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s, border-color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark {
+        background: #e10600;
+        border-color: #e10600;
+    }
+
+    .bcu-checkmark::after {
+        content: "✓";
+        font-size: 9px;
+        color: #fff;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .bcu-checkbox input:checked + .bcu-checkmark::after {
+        opacity: 1;
+    }
+
+    /* ── Buttons matching BCU style ── */
+    .btn-danger {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(225,6,0,0.38);
+        background: rgba(225,6,0,0.09);
+        color: #ff5555;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        transition: background 0.15s, border-color 0.15s;
+    }
+
+        .btn-danger:hover {
+            background: rgba(225,6,0,0.2);
+            border-color: #e10600;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.95);
+        }
+
+    /* ══════════════════════════════════════════
+           TABLE
+        ══════════════════════════════════════════ */
+
+    .prod-table-wrapper {
+        flex: 1;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .prod-table::-webkit-scrollbar-thumb:hover {
+        background: rgba(255,255,255,0.32);
+    }
+
+    .prod-table::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.18);
+        border-radius: 10px;
+    }
+
+    .prod-table::-webkit-scrollbar-track {
+        background: transparent;
+        margin: 0 8px; /* keeps inside rounded edges */
+    }
+
+    .prod-table::-webkit-scrollbar {
+        height: 6px;
+    }
+
+
+        .prod-table-wrapper::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .prod-table-wrapper::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .prod-table-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.18);
+            border-radius: 10px;
+        }
+
+            .prod-table-wrapper::-webkit-scrollbar-thumb:hover {
+                background: rgba(255,255,255,0.32);
+            }
+
+    .prod-table {
+        width: 100%;
+        min-width: max-content;
+        border-radius: 10px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+        border: 1px solid rgba(255,255,255,0.1);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+    }
+
+
+        .prod-table .table-header,
+        .prod-table .table-row {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(max-content, 1fr);
+            align-items: center;
+
+            font-size: 11px;
+        }
+
+        .prod-table .table-body {
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .prod-table .table-header div,
+        .prod-table .table-row div {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+            .prod-table .table-body::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .prod-table .table-body::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            .prod-table .table-body::-webkit-scrollbar-thumb {
+                background: rgba(255,255,255,0.18);
+                border-radius: 10px;
+            }
+
+                .prod-table .table-body::-webkit-scrollbar-thumb:hover {
+                    background: rgba(255,255,255,0.32);
+                }
+
+        .prod-table .table-row {
+            cursor: pointer;
+        }
+
+            .prod-table .table-row:hover {
+                background: rgba(255,255,255,0.04);
+            }
+
+            .prod-table .table-row.prod-selected {
+                background: rgba(225,6,0,0.07) !important;
+                border-left: 2px solid #e10600;
+            }
+
+    .prod-color-swatch {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        vertical-align: middle;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* ══════════════════════════════════════════
+           MODAL
+        ══════════════════════════════════════════ */
+
+    .prod-modal-wide {
+        width: min(900px, 95%) !important;
+    }
+
+    .prod-modal-section-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.32);
+        margin: 4px 0 8px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    #prodModal .bcum-body .form-row {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    #prodModal .bcum-body .form-group {
+        flex: 1;
+        min-width: 140px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        #prodModal .bcum-body .form-group > label:not(.bcu-checkbox) {
+            font-size: 11px;
+            color: rgba(255,255,255,0.55);
+            margin-bottom: 6px;
+            line-height: 1;
+        }
+
+    #prodModal .bcum-body .glass-input {
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 13px;
+        box-sizing: border-box;
+        width: 100%;
+        line-height: 38px;
+    }
+
+        #prodModal .bcum-body .glass-input:focus {
+            border-color: rgba(225,6,0,0.5);
+            box-shadow: 0 0 0 2px rgba(225,6,0,0.15);
+            outline: none;
+        }
+
+    #prodModal .bcum-body .select-trigger {
+        height: 38px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 13px;
+        box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    #prodModal .bcum-body .custom-select {
+        position: relative;
+    }
+
+        #prodModal .bcum-body .custom-select.open {
+            z-index: 10000;
+        }
+
+    #prodModal .bcum-body .select-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 180px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+        z-index: 10001;
+        background: rgba(20,20,20,0.98);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        display: none;
+    }
+
+    #prodModal .bcum-body .custom-select.open .select-dropdown {
+        display: block;
+    }
+
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+
+    /* ── bcu-bool cells ── */
+    .bcu-bool-yes {
+        color: #00ff9c;
+        font-size: 13px;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .bcu-bool-no {
+        color: rgba(255,255,255,0.18);
+        font-size: 13px;
+    }
+
+</style>
+
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+<script>
+
+    /* ═══════════════════════════════
+       STATE
+    ═══════════════════════════════ */
+    var prodSelId   = null;
+    var prodEditing = false;
+
+    /* ═══════════════════════════════
+       BOOT
+    ═══════════════════════════════ */
+    document.addEventListener("DOMContentLoaded", function () {
+        loadProductGroupDropdowns();
+        loadProductTable();
+        wireProdSelects();
+    });
+
+    /* ═══════════════════════════════
+       DROPDOWN LOADERS
+    ═══════════════════════════════ */
+    function loadProductGroupDropdowns() {
+        fetch("/Products/GetProductGroups")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                var html = data.map(function(d) {
+                    return '<div class="option" data-id="' + d.id + '">' + esc(d.name) + '</div>';
+                }).join("");
+                setDropHtml("groupNameDropdown",  html);
+                setDropHtml("blendGroupDropdown", html);
+                setDropHtml("editGroupDropdown",      html);
+                setDropHtml("editBlendGroupDropdown", html);
+            });
+    }
+
+    function setDropHtml(id, html) {
+        var el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+    }
+
+    /* ═══════════════════════════════
+       TABLE LOAD & RENDER
+    ═══════════════════════════════ */
+    function loadProductTable() {
+        fetch("/Products/GetProducts")
+            .then(function(r) { return r.json(); })
+            .then(function(data) { renderProductTable(data); })
+            .catch(function() {
+                var e = document.getElementById("prodTableEmpty");
+                if (e) { e.style.display = "block"; e.textContent = "Failed to load."; }
+            });
+    }
+
+    function renderProductTable(list) {
+        var body  = document.getElementById("prodTableBody");
+        var empty = document.getElementById("prodTableEmpty");
+        if (!body) return;
+
+        if (!list || !list.length) {
+            body.innerHTML = "";
+            if (empty) { empty.style.display = "block"; empty.textContent = "No records found."; }
+            return;
+        }
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = list.map(function(p) {
+            var sel    = p.productId === prodSelId ? " prod-selected" : "";
+            var swatch = '<span class="prod-color-swatch" style="background:' +
+                         esc(p.colorValue || "#ffffff") + ';"></span>';
+
+            return '<div class="table-row' + sel + '" data-id="' + p.productId + '"' +
+                   ' onclick="onProdRowClick(' + p.productId + ')"' +
+                   ' ondblclick="openProdModal(' + p.productId + ')">' +
+                   '<div>' + esc(p.productCode)    + '</div>' +
+                   '<div>' + esc(p.bcuProductCode) + '</div>' +
+                   '<div>' + esc(p.productName)    + '</div>' +
+                   '<div>' + esc(p.description)    + '</div>' +
+                   '<div>' + swatch                + '</div>' +
+                   '<div class="' + (p.isWeighingRequired ? "bcu-bool-yes" : "bcu-bool-no") + '">' + (p.isWeighingRequired ? "&#10004;" : "&mdash;") + '</div>' +
+                   '<div class="' + (p.isActive         ? "bcu-bool-yes" : "bcu-bool-no") + '">' + (p.isActive         ? "&#10004;" : "&mdash;") + '</div>' +
+                   '<div>' + fmtNum(p.propA)        + '</div>' +
+                   '<div>' + fmtNum(p.propB)        + '</div>' +
+                   '<div>' + esc(p.groupName)       + '</div>' +
+                   '<div>' + esc(p.blendGroupName)  + '</div>' +
+                   '<div>' + fmtDec(p.densityMin)   + '</div>' +
+                   '<div>' + fmtDec(p.densityMax)   + '</div>' +
+                   '<div>' + fmtDec(p.densityTol)   + '</div>' +
+                   '<div>' + fmtDec(p.tempMin)      + '</div>' +
+                   '<div>' + fmtDec(p.tempMax)      + '</div>' +
+                   '<div>' + fmtDec(p.tempTol)      + '</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    /* ═══════════════════════════════
+       ROW CLICK — fill form
+    ═══════════════════════════════ */
+    function onProdRowClick(id) {
+        if (prodSelId === id) {
+            prodSelId = null; prodEditing = false;
+            clearProductForm();
+            document.querySelectorAll(".prod-table .table-row").forEach(function(r) { r.classList.remove("prod-selected"); });
+            return;
+        }
+        prodSelId   = id;
+        prodEditing = true;
+        document.querySelectorAll(".prod-table .table-row").forEach(function(r) {
+            r.classList.toggle("prod-selected", parseInt(r.dataset.id) === id);
+        });
+
+        fetch("/Products/GetProductDetail/" + id)
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                document.getElementById("prodCode").value      = d.productCode    || "";
+                document.getElementById("prodERPCode").value   = d.bcuProductCode || "";
+                document.getElementById("prodName").value      = d.productName    || "";
+                document.getElementById("prodDesc").value      = d.description    || "";
+                document.getElementById("densityMax").value    = d.densityMax  != null ? d.densityMax  : "";
+                document.getElementById("densityMin").value    = d.densityMin  != null ? d.densityMin  : "";
+                document.getElementById("densityTol").value    = d.densityTol  != null ? d.densityTol  : "";
+                document.getElementById("tempMax").value       = d.tempMax     != null ? d.tempMax     : "";
+                document.getElementById("tempMin").value       = d.tempMin     != null ? d.tempMin     : "";
+                document.getElementById("tempTol").value       = d.tempTol     != null ? d.tempTol     : "";
+                document.getElementById("proportionA").value   = d.propA       != null ? d.propA       : "";
+                document.getElementById("proportionB").value   = d.propB       != null ? d.propB       : "";
+                document.getElementById("chkWeighing").checked = d.isWeighingRequired || false;
+                document.getElementById("chkActive").checked   = d.isActive           || false;
+                setProdDropValue("groupNameSelect",  d.groupId,      d.groupName      || "Select");
+                setProdDropValue("blendGroupSelect", d.blendGroupId, d.blendGroupName || "Select");
+                setColorSelect("colorSelect", "colorDotPreview", "colorSelectLabel", d.colorValue);
+            });
+    }
+
+    /* ═══════════════════════════════
+       SAVE / DELETE / CLEAR
+    ═══════════════════════════════ */
+    function saveProduct() {
+        var code    = document.getElementById("prodCode").value.trim();
+        var erpCode = document.getElementById("prodERPCode").value.trim();
+        var name    = document.getElementById("prodName").value.trim();
+        if (!code)    { alert("Material Code is required.");     return; }
+        if (!erpCode) { alert("ERP Material Code is required."); return; }
+        if (!name)    { alert("Material Name is required.");     return; }
+
+        var payload    = buildFormPayload();
+        payload.productId = prodEditing ? prodSelId : 0;
+
+        fetch("/Products/SaveProduct", {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { clearProductForm(); loadProductTable(); }
+            else alert(res.message || "Save failed.");
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    function deleteProduct() {
+        if (!prodSelId) { alert("Select a row first."); return; }
+        if (!confirm("Delete selected product?")) return;
+        fetch("/Products/DeleteProduct", {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(prodSelId)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) { clearProductForm(); loadProductTable(); }
+            else alert(res.message || "Delete failed.");
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    function clearProductForm() {
+        ["prodCode","prodERPCode","prodName","prodDesc",
+         "densityMax","densityMin","densityTol",
+         "tempMax","tempMin","tempTol",
+         "proportionA","proportionB"].forEach(function(id) {
+            var el = document.getElementById(id); if (el) el.value = "";
+        });
+        document.getElementById("chkWeighing").checked = false;
+        document.getElementById("chkActive").checked   = false;
+        setProdDropValue("groupNameSelect",  null, "Select");
+        setProdDropValue("blendGroupSelect", null, "Select");
+        setColorSelect("colorSelect", "colorDotPreview", "colorSelectLabel", "");
+        prodSelId   = null;
+        prodEditing = false;
+        document.querySelectorAll(".prod-table .table-row").forEach(function(r) { r.classList.remove("prod-selected"); });
+    }
+
+    /* ═══════════════════════════════
+       EDIT MODAL
+    ═══════════════════════════════ */
+    function openProdModal(id) {
+            fetch("/Products/GetProductDetail/" + id)
+                .then(function(r) { return r.json(); })
+                .then(function(d) {
+                    document.getElementById("editProdId").value      = d.productId;
+                    document.getElementById("editProdCode").value    = d.productCode    || "";
+                    document.getElementById("editProdERPCode").value = d.bcuProductCode || "";
+                    document.getElementById("editProdName").value    = d.productName    || "";
+                    document.getElementById("editProdDesc").value    = d.description    || "";
+                    document.getElementById("editDensityMax").value  = d.densityMax != null ? d.densityMax : "";
+                    document.getElementById("editDensityMin").value  = d.densityMin != null ? d.densityMin : "";
+                    document.getElementById("editDensityTol").value  = d.densityTol != null ? d.densityTol : "";
+                    document.getElementById("editTempMax").value     = d.tempMax    != null ? d.tempMax    : "";
+                    document.getElementById("editTempMin").value     = d.tempMin    != null ? d.tempMin    : "";
+                    document.getElementById("editTempTol").value     = d.tempTol    != null ? d.tempTol    : "";
+                    document.getElementById("editProportionA").value = d.propA      != null ? d.propA      : "";
+                    document.getElementById("editProportionB").value = d.propB      != null ? d.propB      : "";
+                    document.getElementById("editChkWeighing").checked = d.isWeighingRequired || false;
+                    document.getElementById("editChkActive").checked   = d.isActive           || false;
+
+                    copyDropOpts("groupNameDropdown",  "editGroupDropdown");
+                    copyDropOpts("blendGroupDropdown", "editBlendGroupDropdown");
+
+                    setProdDropValue("editGroupSelect",      d.groupId,      d.groupName      || "Select");
+                    setProdDropValue("editBlendGroupSelect", d.blendGroupId, d.blendGroupName || "Select");
+                    setColorSelect("editColorSelect", "editColorDotPreview", "editColorSelectLabel", d.colorValue);
+
+                    document.querySelectorAll(".prod-table .table-row").forEach(function(r) {
+                        r.classList.toggle("prod-selected", parseInt(r.dataset.id) === id);
+                    });
+
+                    var m = document.getElementById("prodModal");
+                    var b = document.getElementById("prodBackdrop");
+                    m.style.display = "block";
+                    b.style.display = "block";
+                    requestAnimationFrame(function() { requestAnimationFrame(function() {
+                        m.classList.add("show");
+                        b.classList.add("show");
+                    }); });
+                });
+        }
+
+        function closeProdModal() {
+            var m = document.getElementById("prodModal");
+            var b = document.getElementById("prodBackdrop");
+            if (!m || !b) return;
+            m.classList.remove("show");
+            b.classList.remove("show");
+            setTimeout(function() { m.style.display = "none"; b.style.display = "none"; }, 220);
+            document.querySelectorAll(".prod-table .table-row").forEach(function(r) { r.classList.remove("prod-selected"); });
+            prodSelId = null;
+        }
+
+    function updateProductFromModal() {
+        var id = parseInt(document.getElementById("editProdId").value);
+        var payload = {
+            productId:          id,
+            productCode:        document.getElementById("editProdCode").value.trim(),
+            bcuProductCode:     document.getElementById("editProdERPCode").value.trim(),
+            productName:        document.getElementById("editProdName").value.trim(),
+            description:        document.getElementById("editProdDesc").value.trim(),
+            groupId:            getSelectId("editGroupSelect"),
+            blendGroupId:       getSelectId("editBlendGroupSelect"),
+            colorValue:         document.getElementById("editColorSelect").getAttribute("data-selected-id") || null,
+            isWeighingRequired: document.getElementById("editChkWeighing").checked,
+            isActive:           document.getElementById("editChkActive").checked,
+            densityMax:         parseDecOrNull(document.getElementById("editDensityMax").value),
+            densityMin:         parseDecOrNull(document.getElementById("editDensityMin").value),
+            densityTol:         parseDecOrNull(document.getElementById("editDensityTol").value),
+            tempMax:            parseDecOrNull(document.getElementById("editTempMax").value),
+            tempMin:            parseDecOrNull(document.getElementById("editTempMin").value),
+            tempTol:            parseDecOrNull(document.getElementById("editTempTol").value),
+            propA:              parseDecOrNull(document.getElementById("editProportionA").value),
+            propB:              parseDecOrNull(document.getElementById("editProportionB").value)
+        };
+
+        if (!payload.productCode)    { alert("Material Code is required.");     return; }
+        if (!payload.bcuProductCode) { alert("ERP Material Code is required."); return; }
+        if (!payload.productName)    { alert("Material Name is required.");     return; }
+
+        fetch("/Products/UpdateProduct", {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload)
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            if (res.success) {
+                prodSelId = null; clearProductForm(); closeProdModal(); loadProductTable();
+            } else {
+                alert(res.message || "Update failed.");
+            }
+        })
+        .catch(function() { alert("Network error."); });
+    }
+
+    /* ═══════════════════════════════
+       HELPERS — payload builder
+    ═══════════════════════════════ */
+    function buildFormPayload() {
+        return {
+            productCode:        document.getElementById("prodCode").value.trim(),
+            bcuProductCode:     document.getElementById("prodERPCode").value.trim(),
+            productName:        document.getElementById("prodName").value.trim(),
+            description:        document.getElementById("prodDesc").value.trim(),
+            groupId:            getSelectId("groupNameSelect"),
+            blendGroupId:       getSelectId("blendGroupSelect"),
+            colorValue:         document.getElementById("colorSelect").getAttribute("data-selected-id") || null,
+            isWeighingRequired: document.getElementById("chkWeighing").checked,
+            isActive:           document.getElementById("chkActive").checked,
+            densityMax:         parseDecOrNull(document.getElementById("densityMax").value),
+            densityMin:         parseDecOrNull(document.getElementById("densityMin").value),
+            densityTol:         parseDecOrNull(document.getElementById("densityTol").value),
+            tempMax:            parseDecOrNull(document.getElementById("tempMax").value),
+            tempMin:            parseDecOrNull(document.getElementById("tempMin").value),
+            tempTol:            parseDecOrNull(document.getElementById("tempTol").value),
+            propA:              parseDecOrNull(document.getElementById("proportionA").value),
+            propB:              parseDecOrNull(document.getElementById("proportionB").value)
+        };
+    }
+
+    /* ═══════════════════════════════
+       HELPERS — dropdowns
+    ═══════════════════════════════ */
+    function setProdDropValue(selectId, id, label) {
+        var sel = document.getElementById(selectId);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", id != null ? id : "");
+        var sp = sel.querySelector(".select-trigger > span:not(.color-trigger-inner)");
+        if (!sp) sp = sel.querySelector(".select-trigger span");
+        if (sp && sp.id !== "colorSelectLabel" && sp.id !== "editColorSelectLabel")
+            sp.textContent = label || "Select";
+    }
+
+    function getSelectId(selectId) {
+        var sel = document.getElementById(selectId);
+        if (!sel) return null;
+        var v = sel.getAttribute("data-selected-id");
+        return v ? (parseInt(v) || null) : null;
+    }
+
+    function copyDropOpts(sourceId, targetId) {
+        var src = document.getElementById(sourceId);
+        var tgt = document.getElementById(targetId);
+        if (src && tgt) tgt.innerHTML = src.innerHTML;
+    }
+
+    function setColorSelect(selectId, dotId, labelId, colorValue) {
+        var sel   = document.getElementById(selectId);
+        var dot   = document.getElementById(dotId);
+        var label = document.getElementById(labelId);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", colorValue || "");
+
+        var names = {
+            "":"White","#FFA500":"Orange","#FF4444":"Red","#4488FF":"Blue",
+            "#44BB66":"Green","#FFD600":"Yellow","#AA44CC":"Purple","#FF6600":"Dark Orange"
+        };
+        if (label) label.textContent = names[colorValue || ""] || "White";
+        if (dot) {
+            dot.style.display    = "inline-block";
+            dot.style.background = colorValue || "#fff";
+            dot.style.border     = colorValue ? "none" : "1px solid #555";
+        }
+    }
+
+    /* ═══════════════════════════════
+       HELPERS — modal
+    ═══════════════════════════════ */
+    function showModal(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = document.getElementById(backdropId);
+        if (!m || !b) return;
+        m.style.display = "block"; b.style.display = "block";
+        requestAnimationFrame(function() { requestAnimationFrame(function() {
+            m.classList.add("show"); b.classList.add("show");
+        }); });
+    }
+
+    function hideModal(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = document.getElementById(backdropId);
+        if (!m || !b) return;
+        m.classList.remove("show"); b.classList.remove("show");
+        setTimeout(function() { m.style.display = "none"; b.style.display = "none"; }, 220);
+    }
+
+    /* ═══════════════════════════════
+       HELPERS — number formatting
+    ═══════════════════════════════ */
+    function fmtNum(v)  { return v != null ? v : "&mdash;"; }
+    function fmtDec(v)  { return v != null ? parseFloat(v).toFixed(2) : "&mdash;"; }
+    function parseDecOrNull(v) {
+        if (v === "" || v == null) return null;
+        var n = parseFloat(v); return isNaN(n) ? null : n;
+    }
+    function esc(s) {
+        if (s == null) return "";
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+    /* ═══════════════════════════════
+       WIRE SELECTS — event delegation
+       Identical pattern to BCU page
+    ═══════════════════════════════ */
+    function wireProdSelects() {
+
+        document.addEventListener("click", function(e) {
+            var trigger = e.target.closest(".select-trigger");
+            if (trigger) {
+                e.stopPropagation();
+                var sel    = trigger.closest(".custom-select");
+                var isOpen = sel.classList.contains("open");
+                document.querySelectorAll(".custom-select.open").forEach(function(s) { s.classList.remove("open"); });
+                if (!isOpen) sel.classList.add("open");
+                return;
+            }
+            if (!e.target.closest(".custom-select")) {
+                document.querySelectorAll(".custom-select.open").forEach(function(s) { s.classList.remove("open"); });
+            }
+        });
+
+        document.addEventListener("mousedown", function(e) {
+            var opt = e.target.closest(".option");
+            if (!opt) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            var sel   = opt.closest(".custom-select");
+            if (!sel) return;
+
+            var selId    = sel.id;
+            var colorVal = opt.getAttribute("data-color");
+            var isColor  = (selId === "colorSelect" || selId === "editColorSelect");
+
+            if (isColor) {
+                var dotId   = selId === "colorSelect" ? "colorDotPreview"     : "editColorDotPreview";
+                var labelId = selId === "colorSelect" ? "colorSelectLabel"    : "editColorSelectLabel";
+                setColorSelect(selId, dotId, labelId, colorVal);
+            } else {
+                var span = sel.querySelector(".select-trigger > span");
+                if (span) span.textContent = opt.textContent.trim();
+                sel.setAttribute("data-selected-id", opt.getAttribute("data-id") || "");
+            }
+            sel.classList.remove("open");
+        });
+    }
+
+</script>

@@ -1,0 +1,706 @@
+﻿@* Trucks.cshtml — full DB binding *@
+
+<div class="bay-module-card">
+
+    <div class="trk-section">
+        <div class="trk-fields">
+
+            <!-- Col 1 -->
+            <div class="trk-col">
+                <div class="form-group">
+                    <label>Registration #<span class="req">*</span></label>
+                    <input type="text" id="trkRegNo" placeholder="AP36X4878" class="glass-input trk-inp" />
+                </div>
+                <div class="form-group">
+                    <label>Truck Type<span class="req">*</span></label>
+                    <div class="custom-select trk-inp" id="trkTypeSelect">
+                        <div class="select-trigger"><span>Select Type</span><div class="arrow"></div></div>
+                        <div class="select-dropdown" id="trkTypeDropdown"></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Lock No</label>
+                    <input type="text" id="trkLockNo" placeholder="20575, 20576" class="glass-input trk-inp" />
+                </div>
+                <div class="trk-checkbox-row">
+                    <label class="trk-checkbox">
+                        <input type="checkbox" id="trkIsBiometric" />
+                        <span class="trk-checkmark"></span>
+                        Is Biometric Done
+                    </label>
+                </div>
+            </div>
+
+            <!-- Col 2 -->
+            <div class="trk-col">
+                <div class="form-group">
+                    <label>Company Name<span class="req">*</span></label>
+                    <input type="text" id="trkCompany" placeholder="Company" class="glass-input trk-inp" />
+                </div>
+                <div class="form-group">
+                    <label>No. of Compartments<span class="req">*</span></label>
+                    <input type="number" id="trkNumComp" placeholder="3" min="1" max="10"
+                           class="glass-input trk-inp" oninput="updateCompartmentGrid()" />
+                </div>
+                <div class="form-group">
+                    <label>Truck Key</label>
+                    <div class="custom-select trk-inp" id="trkKeySelect">
+                        <div class="select-trigger" id="trkKeyTrigger" style="opacity:0.4;">
+                            <span>Select Key</span><div class="arrow"></div>
+                        </div>
+                        <div class="select-dropdown" id="trkKeyDropdown"></div>
+                    </div>
+                </div>
+                <div class="trk-checkbox-row">
+                    <label class="trk-checkbox" id="lblIsPermanent">
+                        <input type="checkbox" id="trkIsPermanent" onchange="onIsPermanentChange()" />
+                        <span class="trk-checkmark"></span>
+                        Is Permanent
+                    </label>
+                </div>
+            </div>
+
+            <!-- Col 3 -->
+            <div class="trk-col">
+                <div class="form-group">
+                    <label>Calibration Due Date<span class="req">*</span></label>
+                    <input type="datetime-local" id="trkCalibDate" class="glass-input trk-inp-date" />
+                </div>
+                <div class="form-group">
+                    <label>License Expiry Date<span class="req">*</span></label>
+                    <input type="datetime-local" id="trkLicenseDate" class="glass-input trk-inp-date" />
+                </div>
+                <div class="form-group">
+                    <label>Explosive Expiry Date<span class="req">*</span></label>
+                    <input type="datetime-local" id="trkExplosiveDate" class="glass-input trk-inp-date" />
+                </div>
+                <div class="trk-col3-bottom">
+                    <div class="trk-btn-row">
+                        <button class="btn-primary" onclick="saveTruck()">Save</button>
+                        <button class="btn-secondary" onclick="clearTruckForm()">Clear</button>
+                        <button class="btn-danger" onclick="deleteTruck()">Delete</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- COMPARTMENT PANEL -->
+        <div class="trk-comp-panel">
+            <div class="trk-comp-title">Compartment Details</div>
+            <div class="trk-comp-header">
+                <div>Compartment No</div>
+                <div>Capacity (Ltrs)</div>
+            </div>
+            <div class="trk-comp-body" id="compartmentGrid">
+                <div class="trk-comp-empty">Enter compartment count</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bay-table trk-table">
+        <div class="table-header">
+            <div>Truck #</div><div>Truck Type</div><div>Compartments</div>
+            <div>Lock / Seal No</div><div>Truck Key</div>
+            <div>Permanent</div><div>Inside</div><div>Biometric</div>
+        </div>
+        <div class="table-body" id="truckTableBody">
+            <div class="table-empty" id="truckTableEmpty">Loading...</div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .trk-section {
+        display: flex;
+        gap: 16px;
+        flex-shrink: 0;
+        margin-bottom: 14px;
+        align-items: stretch;
+    }
+
+    .trk-fields {
+        display: flex;
+        gap: 16px;
+        flex-shrink: 0;
+        align-items: flex-start;
+    }
+
+    .trk-col {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex-shrink: 0;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+        .form-group > label:first-child {
+            font-size: 11px;
+            margin-bottom: 5px;
+            color: rgba(255,255,255,0.65);
+            white-space: nowrap;
+        }
+
+    .trk-inp {
+        width: 150px;
+    }
+
+    .trk-inp-date {
+        width: 188px;
+    }
+
+/*     .trk-inp.custom-select {
+        width: 150px;
+    }
+
+    .trk-inp .select-trigger {
+        width: 150px !important;
+        box-sizing: border-box;
+    } */
+
+    .trk-checkbox-row {
+        padding-top: 2px;
+    }
+
+    .trk-col3-bottom {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 4px;
+    }
+
+    .trk-btn-row {
+        display: flex;
+        gap: 7px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+
+    .trk-checkbox {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        font-size: 12px;
+        color: rgba(255,255,255,0.72);
+        user-select: none;
+        white-space: nowrap;
+    }
+
+        .trk-checkbox input[type="checkbox"] {
+            display: none;
+        }
+
+    .trk-checkmark {
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        border: 1px solid rgba(255,255,255,0.22);
+        background: rgba(255,255,255,0.04);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s,border-color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .trk-checkbox input:checked + .trk-checkmark {
+        background: #e10600;
+        border-color: #e10600;
+    }
+
+    .trk-checkmark::after {
+        content: "✓";
+        font-size: 9px;
+        color: #fff;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+
+    .trk-checkbox input:checked + .trk-checkmark::after {
+        opacity: 1;
+    }
+
+    .btn-danger {
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid rgba(225,6,0,0.38);
+        background: rgba(225,6,0,0.09);
+        color: #ff5555;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+        transition: background 0.15s,border-color 0.15s;
+        position: relative;
+        z-index: 3;
+    }
+
+        .btn-danger:hover {
+            background: rgba(225,6,0,0.2);
+            border-color: #e10600;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.95);
+        }
+
+    .trk-comp-panel {
+        flex: 1;
+        min-width: 180px;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 10px;
+        background: linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));
+        overflow: hidden;
+        height: 260px;
+    }
+
+    .trk-comp-title {
+        padding: 8px 14px;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: #e10600;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.03);
+        flex-shrink: 0;
+    }
+
+    .trk-comp-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: 6px 12px;
+        font-size: 11px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.8);
+        background: rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        flex-shrink: 0;
+    }
+
+    .trk-comp-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 6px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        scrollbar-gutter: stable;
+    }
+
+        .trk-comp-body::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .trk-comp-body::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.18);
+            border-radius: 10px;
+        }
+
+    .trk-comp-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .comp-label {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.55);
+        padding-left: 2px;
+    }
+
+    .trk-comp-row input {
+        height: 28px;
+        padding: 3px 8px;
+        border-radius: 6px;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12px;
+        outline: none;
+        transition: border 0.2s;
+    }
+
+        .trk-comp-row input:focus {
+            border-color: rgba(225,6,0,0.5);
+            box-shadow: 0 0 5px rgba(225,6,0,0.15);
+        }
+
+    .trk-comp-empty {
+        color: rgba(255,255,255,0.2);
+        font-size: 11.5px;
+        text-align: center;
+        padding: 30px 0;
+    }
+
+    .trk-table .table-header, .trk-table .table-row {
+        grid-template-columns: 1.4fr 90px 100px 1fr 90px 80px 70px 80px;
+    }
+
+    .trk-bool-yes {
+        color: #00ff9c;
+        font-size: 14px;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .trk-bool-no {
+        color: rgba(255,255,255,0.18);
+        font-size: 14px;
+    }
+
+    .table-row {
+        cursor: pointer;
+    }
+
+        .table-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .table-row.trk-selected {
+            background: rgba(225,6,0,0.07) !important;
+            border-left: 2px solid #e10600;
+        }
+
+    .table-empty {
+        padding: 28px;
+        text-align: center;
+        color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+<script>
+
+    let allTrucks   = [];
+    let truckSelId  = null;   // currently selected row id
+    let editingId   = null;   // truck being edited (null = new)
+    let truckTypes  = [];
+    let truckKeys   = [];
+
+    // ── Boot ──────────────────────────────────────────────────────────────
+    document.addEventListener("DOMContentLoaded", function () {
+        loadDropdowns();
+        loadTable();
+    onIsPermanentChange();
+    });
+
+    // ── Load dropdowns (TruckType + TruckKeys) ────────────────────────────
+    function loadDropdowns() {
+        // TruckType
+        fetch('/Trucks/GetTruckTypes')
+            .then(r => r.json())
+            .then(data => {
+                truckTypes = data;
+                const dd = document.getElementById("trkTypeDropdown");
+                        dd.innerHTML =	 data.map(t =>
+                        `<div class="option" data-id="${esc(t.id)}">${esc(t.description)}</div>`
+                    ).join("");
+            });
+
+        // TruckKeys (unassigned)
+        fetch('/Trucks/GetTruckKeys')
+            .then(r => r.json())
+            .then(data => {
+                truckKeys = data;
+                buildKeyDropdown(data);
+            });
+    }
+
+    function buildKeyDropdown(keys) {
+        const dd = document.getElementById("trkKeyDropdown");
+        dd.innerHTML = keys.map(k =>
+            `<div class="option" data-id="${k.truckKeyId}">${k.truckKey}</div>`
+        ).join("");
+    }
+
+    // ── Is Permanent interlock ────────────────────────────────────────────
+    // Truck Key can only be assigned when Is Permanent is checked
+    function onIsPermanentChange() {
+        const checked = document.getElementById("trkIsPermanent").checked;
+        const trigger = document.getElementById("trkKeyTrigger");
+        trigger.style.opacity       = checked ? "1"    : "0.4";
+        trigger.style.pointerEvents = checked ? "auto" : "none";
+        if (!checked) {
+            // Clear key selection
+            document.querySelector("#trkKeySelect .select-trigger span").textContent = "Select Key";
+            document.getElementById("trkKeySelect").setAttribute("data-selected-id", "");
+        }
+    }
+
+    // ── Load table ────────────────────────────────────────────────────────
+    function loadTable() {
+        fetch('/Trucks/GetTrucks')
+            .then(r => r.json())
+            .then(data => {
+
+                console.log("LATEST DATA:", data);  // ADD THIS
+
+                allTrucks = data;
+                renderTable(data);
+            });
+    }
+
+    function renderTable(trucks) {
+    const body  = document.getElementById("truckTableBody");
+    const empty = document.getElementById("truckTableEmpty");
+
+    if (!body) return;   // safety
+        if (!trucks || !trucks.length) {
+                body.innerHTML = ""; 
+                if (empty) { empty.style.display = "block";
+            empty.textContent = "No records found.";} return;
+        }
+if (empty) empty.style.display = "none";
+        body.innerHTML = trucks.map(t => `
+            <div class="table-row ${t.truckId === truckSelId ? 'trk-selected' : ''}"
+                 data-id="${t.truckId}" onclick="onRowClick(${t.truckId})">
+                <div>${esc(t.registrationNumber)}</div>
+                <div>${esc(t.truckTypeName)}</div>
+                <div>${t.noOfCompartments}</div>
+                <div>${esc(t.lockNo)}</div>
+                <div>${t.truckKey ?? '—'}</div>
+                <div class="${t.isPermanentKey?'trk-bool-yes':'trk-bool-no'}">${t.isPermanentKey?'✔':'—'}</div>
+                <div class="${t.isInside?'trk-bool-yes':'trk-bool-no'}">${t.isInside?'✔':'—'}</div>
+                <div class="${t.isBioMetric?'trk-bool-yes':'trk-bool-no'}">${t.isBioMetric?'✔':'—'}</div>
+            </div>`).join("");
+    }
+
+    // ── Row click: toggle select + spread to form ─────────────────────────
+    function onRowClick(truckId) {
+        if (truckSelId === truckId) {
+            // Second click — deselect and clear form
+            truckSelId = null;
+            editingId  = null;
+            clearTruckForm();
+            document.querySelectorAll(".trk-table .table-row")
+                .forEach(r => r.classList.remove("trk-selected"));
+            return;
+        }
+
+        truckSelId = truckId;
+        editingId  = truckId;
+
+        document.querySelectorAll(".trk-table .table-row").forEach(r =>
+            r.classList.toggle("trk-selected", parseInt(r.dataset.id) === truckId));
+
+        // Fetch full detail and spread to form
+        fetch(`/Trucks/GetTruckDetail/${truckId}`)
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById("trkRegNo").value    = d.registrationNumber;
+                document.getElementById("trkCompany").value  = d.companyName;
+                document.getElementById("trkNumComp").value  = d.noOfCompartments;
+                document.getElementById("trkLockNo").value   = d.lockNo;
+                document.getElementById("trkCalibDate").value    = d.callibrationDueDate ?? "";
+                document.getElementById("trkLicenseDate").value  = d.licenseExpireDate   ?? "";
+                document.getElementById("trkExplosiveDate").value= d.explosiveExpiryDate ?? "";
+                document.getElementById("trkIsPermanent").checked = d.isPermanentKey;
+                document.getElementById("trkIsBiometric").checked = d.isBioMetric;
+
+                // Truck Type dropdown
+                setDropValue("trkTypeSelect", d.truckTypeId, d.truckTypeName);
+
+                // Truck Key — show current key even if assigned (for editing)
+                const keyLabel = d.truckKey ? String(d.truckKey) : "Select Key";
+                setDropValue("trkKeySelect", d.truckKeyId ?? "", keyLabel);
+                onIsPermanentChange(); // respect permanent interlock
+
+                // Compartments
+                updateCompartmentGrid(d.compartments);
+            });
+    }
+
+    // ── Compartment grid ──────────────────────────────────────────────────
+    // existingData: array from server on row-click
+    // If not provided, preserve whatever is already in the grid inputs
+    function updateCompartmentGrid(existingData) {
+        const n    = parseInt(document.getElementById("trkNumComp").value) || 0;
+        const grid = document.getElementById("compartmentGrid");
+        if (n < 1 || n > 10) {
+            grid.innerHTML = '<div class="trk-comp-empty">Enter valid count (1–10)</div>';
+            return;
+        }
+
+        // Capture current input values before rebuilding
+        const currentCaps = {};
+        grid.querySelectorAll("input[id^='compCap']").forEach(inp => {
+            const idx = parseInt(inp.id.replace("compCap",""));
+            currentCaps[idx] = inp.value;
+        });
+
+        grid.innerHTML = Array.from({length: n}, (_, i) => {
+            let cap = "";
+            if (existingData && existingData[i]) {
+                // Server data takes priority (row click)
+                cap = existingData[i].capacity;
+            } else if (currentCaps[i+1] !== undefined) {
+                // Preserve existing typed values when count changes
+                cap = currentCaps[i+1];
+            }
+            return `<div class="trk-comp-row">
+                <div class="comp-label">Compartment ${i+1}</div>
+                <input type="number" placeholder="Capacity" min="0"
+                       id="compCap${i+1}" value="${cap}" />
+            </div>`;
+        }).join("");
+    }
+
+    // ── Save ──────────────────────────────────────────────────────────────
+    function saveTruck() {
+        const regNo   = document.getElementById("trkRegNo").value.trim();
+        const typeId  = document.getElementById("trkTypeSelect").getAttribute("data-selected-id") || "";
+        const company = document.getElementById("trkCompany").value.trim();
+        const numComp = parseInt(document.getElementById("trkNumComp").value) || 0;
+        const isPerm  = document.getElementById("trkIsPermanent").checked;
+        const keyId   = parseInt(document.getElementById("trkKeySelect").getAttribute("data-selected-id")) || 0;
+        const isBio   = document.getElementById("trkIsBiometric").checked;
+
+        if (!regNo)   { alert("Registration Number is required."); return; }
+        if (!typeId)  { alert("Truck Type is required."); return; }
+        if (!company) { alert("Company Name is required."); return; }
+        if (numComp < 1) { alert("No. of Compartments must be at least 1."); return; }
+        if (isPerm && !keyId) { alert("Truck Key is required when Is Permanent is checked."); return; }
+
+        // Collect compartments
+        const compartments = [];
+        for (let i = 1; i <= numComp; i++) {
+            const cap = parseInt(document.getElementById("compCap" + i)?.value) || 0;
+            compartments.push({ compartmentNo: i, capacity: cap });
+        }
+
+        const payload = {
+            truckId:            editingId,
+            registrationNumber: regNo,
+            truckTypeId:        typeId,
+            truckKeyId:         isPerm && keyId ? keyId : null,
+            isPermanentKey:     isPerm,
+            companyName:        company,
+            noOfCompartments:   numComp,
+            lockNo:             document.getElementById("trkLockNo").value.trim(),
+            callibrationDueDate: document.getElementById("trkCalibDate").value    || null,
+            licenseExpireDate:   document.getElementById("trkLicenseDate").value  || null,
+            explosiveExpiryDate: document.getElementById("trkExplosiveDate").value|| null,
+            isBioMetric:        isBio,
+            compartments:       compartments
+        };
+
+    fetch('/Trucks/SaveTruck', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    })
+    .then(res => res.json())
+    .then(res => {
+    if (res.success) {
+
+        alert("Saved successfully");
+
+        truckSelId = null;
+        editingId  = null;
+
+        clearTruckForm();
+        
+        loadTable();
+
+    } else {
+        alert(res.message);
+    }
+    });
+    }
+
+    // ── Delete ────────────────────────────────────────────────────────────
+    function deleteTruck() {
+        if (!truckSelId) { alert("Select a row first."); return; }
+        if (!confirm("Delete selected truck?")) return;
+
+        fetch('/Trucks/DeleteTruck', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(truckSelId)
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                clearTruckForm();
+                loadTable();
+                loadDropdowns();
+            } else {
+                alert(res.message || "Delete failed.");
+            }
+        });
+    }
+
+    // ── Clear form ────────────────────────────────────────────────────────
+    function clearTruckForm() {
+        ["trkRegNo","trkCompany","trkNumComp","trkLockNo",
+         "trkCalibDate","trkLicenseDate","trkExplosiveDate"]
+            .forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+        document.getElementById("trkIsPermanent").checked = false;
+        document.getElementById("trkIsBiometric").checked = false;
+        document.getElementById("compartmentGrid").innerHTML =
+            '<div class="trk-comp-empty">Enter compartment count</div>';
+        setDropValue("trkTypeSelect", "", "Select Type");
+        setDropValue("trkKeySelect",  "", "Select Key");
+        onIsPermanentChange(); // re-lock key dropdown
+        truckSelId = null;
+        editingId  = null;
+    }
+
+    // // ── Dropdown helpers ──────────────────────────────────────────────────
+    // function wireSelects() {
+    //     document.addEventListener("click", function(e) {
+    //         const trigger = e.target.closest(".select-trigger");
+    //         if (trigger) {
+    //             e.stopPropagation();
+    //             const sel    = trigger.closest(".custom-select");
+    //             const isOpen = sel.classList.contains("open");
+    //             document.querySelectorAll(".custom-select.open").forEach(s => s.classList.remove("open"));
+    //             if (!isOpen) sel.classList.add("open");
+    //             return;
+    //         }
+    //         const opt = e.target.closest(".option");
+    //         if (opt) {
+    //             e.stopPropagation();
+    //             const sel  = opt.closest(".custom-select");
+    //             sel.querySelector(".select-trigger span").textContent = opt.textContent;
+    //             sel.setAttribute("data-selected-id", opt.dataset.id || opt.textContent);
+    //             sel.classList.remove("open");
+    //             return;
+    //         }
+    //         document.querySelectorAll(".custom-select.open").forEach(s => s.classList.remove("open"));
+    //     });
+    // }
+
+    function setDropValue(selectId, id, label) {
+        const sel = document.getElementById(selectId);
+        if (!sel) return;
+        sel.setAttribute("data-selected-id", id ?? "");
+        const sp = sel.querySelector(".select-trigger span");
+        if (sp) sp.textContent = label || "Select";
+    }
+
+    function esc(s) {
+        if (!s && s !== 0) return "";
+        return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
+                        .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+    }
+
+</script>

@@ -1,0 +1,1318 @@
+@{
+    ViewBag.Title = "Truck Entry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="bay-module-card">
+    <div class="bay-toggle">
+        <div class="bay-tab active">Entry</div>
+        <div class="bay-indicator"></div>
+    </div>
+    <div class="bay-content">
+    <div class="te-grid">
+
+        <div class="te-panel">
+
+            <div class="te-toolbar">
+                <div class="te-search-wrap">
+                    <label class="te-search-label" for="truckSearch">Truck Reg #</label>
+                    <input type="text" id="truckSearch" class="glass-input te-search"
+                           placeholder="" oninput="filterAvailableTable()" />
+                    <button class="btn-secondary te-find-btn" onclick="filterAvailableTable()">Find</button>
+                    <button class="btn-primary" id="btnEntry" onclick="onEntryClick()">Entry</button>
+                    <button class="btn-secondary" id="btnSapPosting" onclick="onSapPosting()">SAP Posting</button>
+                </div>
+                <div class="te-toolbar-note">Select the Truck and Click on Entry Button</div>
+            </div>
+
+            <div class="bay-table te-avail-table" id="availTrucksWrapper">
+                    <div class="table-header">
+                        <div>Sel</div>
+                        <div>No</div>
+                        <div>Type</div>
+                        <div>Key</div>
+                        <div>Company Name</div>
+                        <div>No Of Comp</div>
+                        <div>IsPermanent</div>
+                        <div>Printed Tare</div>
+                        <div>Printed Gross</div>
+                        <div>Tanker Tare</div>
+                        <div>Tanker Gross</div>
+                        <div>CCOE Perm</div>
+                        <div>Callibration Due</div>
+                        <div>License Expire</div>
+                        <div>Explosive Expiry</div>
+                        <div>Action</div>
+                    </div>
+
+                    <div class="table-body" id="availTruckBody">
+                        <div class="table-empty" id="availTruckEmpty">Loading...</div>
+                    </div>
+
+            </div>
+
+            <div class="te-subhead">
+                <div class="te-subhead-title">Today's Trucks</div>
+                <div class="te-subhead-note">Click on Selection for Select All Records</div>
+            </div>
+            <div class="bay-table te-today-table" id="todayTrucksWrapper">
+
+                    <div class="table-header">
+                        <div>Sel</div>
+                        <div>Date</div>
+                        <div>Entry Time</div>
+                        <div>Type</div>
+                        <div>No.</div>
+                        <div>Type</div>
+                        <div>Company Name</div>
+                        <div>No Of Comp</div>
+                        <div>Key Number</div>
+                        <div>Is Permanent</div>
+                        <div>CCOE Perm</div>
+                        <div>Tanker Tare</div>
+                        <div>Tanker Gross</div>
+                        <div>Callibration Due</div>
+                        <div>License Expire</div>
+                        <div>Status</div>
+                        <div>Seq. No</div>
+                        <div>Response</div>
+                        <div>Lic Expiry</div>
+                    </div>
+
+                    <div class="table-body" id="todayTruckBody">
+                        <div class="table-empty" id="todayTruckEmpty">Loading...</div>
+                    </div>
+            </div>
+        </div>
+
+    </div><!-- /.te-grid -->
+    </div><!-- /.bay-content -->
+</div><!-- /.bay-module-card -->
+<!-- ???????????????????????????????????????????
+     MODAL 1 — Confirm Entry
+??????????????????????????????????????????? -->
+<div class="bcum-backdrop" id="confirmBackdrop"></div>
+<div class="bcum-modal te-modal" id="confirmModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon">&#10003;</span> Confirm Entry</div>
+        <button class="bcum-close" onclick="closeModal('confirmModal','confirmBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text" id="confirmText">Are you sure to mark <strong id="confirmTruckNum"></strong> as Present?</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-secondary" onclick="closeModal('confirmModal','confirmBackdrop')">No</button>
+        <button class="btn-primary" onclick="onConfirmYes()">Yes</button>
+    </div>
+</div>
+
+<!-- ???????????????????????????????????????????
+     MODAL 2 — SOD Not Started
+??????????????????????????????????????????? -->
+<div class="bcum-backdrop" id="sodBackdrop"></div>
+<div class="bcum-modal te-modal" id="sodModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> Day Not Started</div>
+        <button class="bcum-close" onclick="closeModal('sodModal','sodBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text">There is no TAS Day started, please make sure the day is started before proceeding with truck entry.</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="closeModal('sodModal','sodBackdrop')">OK</button>
+    </div>
+</div>
+
+<!-- ???????????????????????????????????????????
+     MODAL 3 — No Truck Selected
+??????????????????????????????????????????? -->
+<div class="bcum-backdrop" id="noSelBackdrop"></div>
+<div class="bcum-modal te-modal" id="noSelModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> No Truck Selected</div>
+        <button class="bcum-close" onclick="closeModal('noSelModal','noSelBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text">Please select a truck from the Available Trucks table before clicking Entry.</p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="closeModal('noSelModal','noSelBackdrop')">OK</button>
+    </div>
+</div>
+
+<!-- ???????????????????????????????????????????
+     MODAL 4 — Manual Entry Form
+??????????????????????????????????????????? -->
+<div class="bcum-backdrop" id="manualBackdrop"></div>
+<div class="bcum-modal te-modal" id="manualModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon">&#9998;</span> Manual Truck Entry</div>
+        <button class="bcum-close" onclick="closeModal('manualModal','manualBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <div class="form-group" style="gap:6px;">
+            <label class="te-field-label">Reason <span class="req">*</span></label>
+            <div class="custom-select te-modal-select" id="reasonSelect">
+                <div class="select-trigger">
+                    <span id="reasonSelectLabel">Select Reason</span>
+
+                </div>
+                <div class="select-dropdown" id="reasonDropdown"></div>
+            </div>
+        </div>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-secondary" onclick="closeModal('manualModal','manualBackdrop')">Close</button>
+        <button class="btn-primary" onclick="onPostEntry()" id="btnPost">
+            <span id="btnPostLabel">POST</span>
+        </button>
+    </div>
+</div>
+
+<!-- ???????????????????????????????????????????
+     MODAL 5 — Error / Info
+??????????????????????????????????????????? -->
+<div class="bcum-backdrop" id="errBackdrop"></div>
+<div class="bcum-modal te-modal" id="errModal">
+    <div class="bcum-header">
+        <div class="bcum-title"><span class="bcum-icon te-warn-icon">&#9888;</span> Notice</div>
+        <button class="bcum-close" onclick="closeModal('errModal','errBackdrop')">&#10005;</button>
+    </div>
+    <div class="bcum-body te-modal-body">
+        <p class="te-confirm-text" id="errModalText"></p>
+    </div>
+    <div class="bcum-footer">
+        <div style="flex:1"></div>
+        <button class="btn-primary" onclick="closeModal('errModal','errBackdrop')">OK</button>
+    </div>
+</div>
+
+
+<!-- ???????????????????????????????????????????
+     PAGE-SCOPED STYLES
+??????????????????????????????????????????? -->
+<style>
+
+    .te-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+        box-sizing: border-box;
+    }
+
+    .te-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+        width: 100%;
+        overflow: visible;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .te-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: nowrap;
+    }
+
+    .te-search-wrap {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex: 0 1 auto;
+        min-width: 0;
+        white-space: nowrap;
+    }
+
+    .te-search-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.82);
+        white-space: nowrap;
+    }
+
+    .te-search {
+        flex: 0 0 140px;
+        height: 36px;
+        padding: 0 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255,255,255,0.12);
+        background: rgba(255,255,255,0.04);
+        color: #fff;
+        font-size: 12px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.15s;
+    }
+
+        .te-search:focus {
+            border-color: rgba(225,6,0,0.5);
+            box-shadow: 0 0 0 2px rgba(225,6,0,0.1);
+        }
+
+    .te-find-btn {
+        height: 36px;
+        padding: 0 14px;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+
+    .te-group-label {
+        font-size: 12px;
+        color: rgba(255,255,255,0.28);
+        padding: 0 2px;
+    }
+
+    .te-toolbar-note {
+        flex: 1;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: #6f8cff;
+        white-space: nowrap;
+    }
+
+    .te-subhead {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        padding: 0 2px;
+    }
+
+    .te-subhead-title,
+    .te-subhead-note {
+        font-size: 13px;
+        font-weight: 600;
+        color: #6f8cff;
+        white-space: nowrap;
+    }
+
+    .table-wrapper {
+        display: none;
+    }
+
+    .te-avail-table .table-header,
+    .te-avail-table .table-row {
+        grid-template-columns: 44px 128px 76px 72px 126px 92px 98px 96px 96px 96px 104px 96px 112px 112px 118px 82px;
+        font-size: 11px;
+    }
+
+    .te-today-table .table-header,
+    .te-today-table .table-row {
+        grid-template-columns: 44px 88px 84px 70px 126px 76px 126px 92px 90px 98px 96px 96px 104px 112px 112px 74px 84px 132px 132px;
+        font-size: 11px;
+    }
+
+    /* Top table — takes more vertical space */
+    .te-avail-table {
+        flex: 6;
+        min-height: 150px;
+        overflow-y: hidden;
+    }
+
+        .te-avail-table .table-body {
+            overflow-y: auto !important;
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+        }
+
+    .bay-table {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        min-height: 0;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: rgba(255,255,255,0.02);
+        overflow-x: auto;
+        overflow-y: hidden;
+        position: static;
+    }
+
+    .te-today-table {
+        flex: 4;
+        min-height: 130px;
+        overflow-y: hidden;
+    }
+
+        .te-today-table .table-body {
+            overflow-y: auto !important;
+            flex: 1;
+            min-height: 0;
+            max-height: none;
+        }
+
+    .table-header-wrap {
+        flex: 0 0 auto;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        width: 100%;
+    }
+
+    .table-body-scroll {
+        flex: 1 1 0;
+        height: calc(100% - 52px);
+        min-height: calc(100% - 52px);
+        max-height: calc(100% - 52px);
+        scrollbar-gutter: stable;
+        background: rgba(255,255,255,0.02);
+        width: 100%;
+    }
+
+    .table-body {
+        overflow-y: auto;
+        overflow-x: hidden; /* ❗ IMPORTANT */
+        flex: 1;
+        min-height: 0;
+    }
+
+    .bay-table .table-header,
+    .bay-table .table-body {
+        min-width: max-content;
+    }
+
+    .table-header {
+        display: grid;
+        width: max-content;
+    }
+
+    .table-body {
+        display: block;
+        width: max-content;
+    }
+
+
+    .bay-table .table-header {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* ?? Row states ??????????????????????????????????????? */
+    .te-avail-table .table-row,
+    .te-today-table .table-row {
+        cursor: pointer;
+    }
+
+        .te-avail-table .table-row:hover,
+        .te-today-table .table-row:hover {
+            background: rgba(255,255,255,0.04);
+        }
+
+        .te-avail-table .table-row.te-selected {
+            background: rgba(225,6,0,0.07) !important;
+            border-left: 2px solid #e10600;
+        }
+
+    /* ?? Checkbox cell ???????????????????????????????????? */
+    .te-row-check {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .te-row-check input[type="radio"] {
+            display: none;
+        }
+
+    .te-radio-mark {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        border: 1.4px solid rgba(255,255,255,0.28);
+        background: rgba(255,255,255,0.03);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.18s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .te-row-check input:checked + .te-radio-mark {
+        background: linear-gradient(180deg, #ff4d4d 0%, #cc0000 100%);
+        border-color: #e10600;
+        box-shadow: 0 0 4px rgba(225, 6, 0, 0.45);
+    }
+
+    .te-radio-mark::after {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.18s ease;
+    }
+
+    .te-row-check input:checked + .te-radio-mark::after {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .te-radio-mark:hover {
+        border-color: rgba(255,255,255,0.45);
+        background: rgba(255,255,255,0.04);
+    }
+
+    /* ?? Status badges ???????????????????????????????????? */
+    .te-status-y {
+        color: #00ff9c;
+        font-size: 12px;
+        font-weight: 600;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .te-status-n {
+        color: rgba(255,255,255,0.2);
+        font-size: 12px;
+    }
+
+    .te-badge-m {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        background: rgba(255,165,0,0.15);
+        border: 1px solid rgba(255,165,0,0.35);
+        color: #ffb347;
+        letter-spacing: 0.4px;
+    }
+
+    .te-badge-a {
+        display: inline-block;
+        padding: 1px 7px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 600;
+        background: rgba(0,200,120,0.12);
+        border: 1px solid rgba(0,200,120,0.3);
+        color: #00e085;
+        letter-spacing: 0.4px;
+    }
+
+    /* ?? Lic Expiry coloring ?????????????????????????????? */
+    .te-lic-ok {
+        color: rgba(255,255,255,0.75);
+    }
+
+    .te-lic-warn {
+        color: #ffd600;
+    }
+
+    .te-lic-exp {
+        color: #ff5555;
+    }
+
+    /* ?? Modal overrides ?????????????????????????????????? */
+    .te-modal {
+        width: min(440px, 92%) !important;
+    }
+
+    .te-modal-body {
+        padding: 22px 22px 10px !important;
+        gap: 14px !important;
+    }
+
+    .te-confirm-text {
+        font-size: 13px;
+        color: rgba(255,255,255,0.8);
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .te-field-label {
+        font-size: 11px;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 6px;
+        line-height: 1;
+        letter-spacing: 0.2px;
+        display: block;
+    }
+
+    /* Modal select dropdown */
+    .te-modal-select {
+        position: relative;
+        width: 100%;
+    }
+
+        .te-modal-select .select-trigger {
+            height: 38px;
+            padding: 0 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: #fff;
+            font-size: 13px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .te-modal-select .select-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            width: 100%;
+            background: rgba(20,20,20,0.98);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            z-index: 999999; /* ← was 10002 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+    #manualModal {
+        overflow: visible !important;
+    }
+
+        #manualModal .bcum-body {
+            overflow: visible !important;
+        }
+
+        #manualModal .te-modal-body {
+            overflow: visible !important;
+        }
+
+        #manualModal .form-group {
+            overflow: visible !important;
+        }
+
+        #manualModal .te-modal-select {
+            overflow: visible !important;
+        }
+
+        .te-modal-select.open .select-dropdown {
+            display: block;
+        }
+
+        .te-modal-select .select-dropdown .option {
+            padding: 9px 14px;
+            font-size: 12.5px;
+            color: rgba(255,255,255,0.85);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+            .te-modal-select .select-dropdown .option:hover {
+                background: rgba(255,255,255,0.08);
+            }
+
+    .te-warn-icon {
+        color: #ffd600 !important;
+    }
+
+
+
+/* Loading spinner pulse */
+/* @@keyframes te-pulse {
+    0%, 100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+.te-loading {
+    animation: te-pulse 1.2s ease-in-out infinite;
+} */
+
+    /* btn sizing resets */
+    .btn-primary, .btn-secondary, .btn-danger {
+        cursor: pointer;
+    }
+
+    /* ?? Scrollbar styling (matching Tanks page) ?????????? */
+    .bay-table::-webkit-scrollbar {
+        height: 6px;
+        width: 6px;
+    }
+
+    .bay-table::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .bay-table::-webkit-scrollbar-thumb {
+        background: linear-gradient( 180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.08) );
+        border-radius: 10px;
+    }
+
+        .bay-table::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient( 180deg, rgba(255,255,255,0.4), rgba(255,255,255,0.12) );
+        }
+
+    .bay-table::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    /* Ensure bay-table header/rows render as grid */
+    .bay-table .table-header,
+    .bay-table .table-row {
+        display: grid;
+        align-items: center;
+    }
+
+    .te-avail-table .table-header div,
+    .te-avail-table .table-row div,
+    .te-today-table .table-header div,
+    .te-today-table .table-row div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-width: 0;
+        padding: 0 8px;
+        box-sizing: border-box;
+    }
+
+    .te-avail-table .table-body,
+    .te-today-table .table-body {
+        min-width: max-content;
+        min-height: 100%;
+    }
+
+    .te-center {
+        text-align: center;
+    }
+
+    .te-action-cell {
+        color: rgba(255,255,255,0.3);
+    }
+
+    /* Restore existing design tokens if not in site.css */
+    .req {
+        color: #e10600;
+        margin-left: 2px;
+        font-size: 10px;
+    }
+
+    .bcum-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 1000;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+
+        .bcum-backdrop.show {
+            opacity: 1;
+        }
+
+    .bcum-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(160deg, rgba(42,42,42,0.99) 0%, rgba(22,22,22,0.97) 100%);
+        border: 1px solid rgba(255,255,255,0.13);
+        border-radius: 14px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+        z-index: 1001;
+        opacity: 0;
+        transition: opacity 0.22s ease, transform 0.22s cubic-bezier(.2,.8,.2,1);
+    }
+
+        .bcum-modal.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+    .bcum-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px 13px;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .bcum-title {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.9);
+        letter-spacing: 0.4px;
+    }
+
+    .bcum-icon {
+        color: #e10600;
+        font-size: 15px;
+    }
+
+    .bcum-close {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.35);
+        font-size: 15px;
+        cursor: pointer;
+        padding: 3px 7px;
+        border-radius: 5px;
+        transition: color 0.15s, background 0.15s;
+        line-height: 1;
+    }
+
+        .bcum-close:hover {
+            color: #e10600;
+            background: rgba(225,6,0,0.1);
+        }
+
+    .bcum-body {
+        padding: 20px 20px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .bcum-footer {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 20px 18px;
+        border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .btn-primary {
+        position: relative;
+        padding: 8px 18px;
+        border-radius: 999px;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(180deg, #ff4d4d 0%, #ff1f1f 40%, #cc0000 70%, #990000 100%);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.4), 0 0 8px rgba(255,0,0,0.25);
+        transition: all 0.15s ease;
+    }
+
+        .btn-primary:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.95) translateY(1px);
+        }
+
+    .btn-secondary {
+        padding: 8px 18px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.15);
+        color: rgba(255,255,255,0.85);
+        font-size: 12px;
+        cursor: pointer;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
+        transition: all 0.15s ease;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.95);
+        }
+
+    #manualModal,
+    #manualModal .bcum-body,
+    #manualModal .bcum-body .form-group {
+        overflow: visible !important;
+    }
+
+    .bcum-modal {
+        overflow: visible !important;
+    }
+
+    .bcum-modal {
+        z-index: 99999 !important;
+    }
+
+    .bcum-backdrop {
+        z-index: 99998 !important;
+    }
+
+    .table-empty {
+        padding: 28px;
+        text-align: center;
+        color: rgba(255,255,255,0.28);
+        font-size: 13px;
+        letter-spacing: 0.5px;
+    }
+
+    .bcu-bool-yes {
+        color: #00ff9c;
+        font-size: 13px;
+        text-shadow: 0 0 5px rgba(0,255,150,0.4);
+    }
+
+    .bcu-bool-no {
+        color: rgba(255,255,255,0.18);
+        font-size: 13px;
+    }
+</style>
+
+
+<!-- ???????????????????????????????????????????
+     JAVASCRIPT
+??????????????????????????????????????????? -->
+<script>
+
+    /* ???????????????????????????????????????
+       STATE
+    ??????????????????????????????????????? */
+    var selectedTruckId   = null;
+    var selectedTruckNum  = null;
+    var selectedReason    = null;
+    var availTrucksList   = [];
+    var entryReasonList   = [];
+    var selectedEntryId = null;
+    var todayTrucksList = [];
+
+        /* ???????????????????????????????????????
+       BOOT
+    ??????????????????????????????????????? */
+    document.addEventListener("DOMContentLoaded", function () {
+        loadAvailableTrucks();
+        loadTodayTrucks();
+        loadEntryReasons();
+        wireReasonDropdown();
+    });
+
+    /* ???????????????????????????????????????
+       DATA LOADS
+    ??????????????????????????????????????? */
+    function loadAvailableTrucks() {
+        setEmpty("availTruckEmpty", "Loading...", true);
+        fetch("/Truck/GetAvailableTrucks")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                availTrucksList = Array.isArray(data) ? data : [];
+                renderAvailTrucks(availTrucksList);
+            })
+            .catch(function() { setEmpty("availTruckEmpty", "Failed to load.", true); });
+    }
+
+    function loadTodayTrucks() {
+        setEmpty("todayTruckEmpty", "Loading...", true);
+        fetch("/Truck/GetTodayTrucks")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+     todayTrucksList = Array.isArray(data) ? data : [];
+    renderTodayTrucks(todayTrucksList);
+            })
+            .catch(function() { setEmpty("todayTruckEmpty", "Failed to load.", true); });
+    }
+
+    function loadEntryReasons() {
+        renderReasonDropdown(true);
+        fetch("/Truck/GetEntryReasons")
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                entryReasonList = Array.isArray(data) ? data : [];
+                renderReasonDropdown(false);
+            })
+            .catch(function() {
+                entryReasonList = [];
+                renderReasonDropdown(false);
+            });
+    }
+
+        /* ???????????????????????????????????????
+       RENDER — Available Trucks
+    ??????????????????????????????????????? */
+    function renderAvailTrucks(list) {
+        var body  = document.getElementById("availTruckBody");
+        var empty = document.getElementById("availTruckEmpty");
+        if (!body) return;
+
+        if (!list || !list.length) {
+            body.innerHTML = "";
+            setEmpty("availTruckEmpty", "No trucks available.", true);
+            return;
+        }
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = list.map(function(t) {
+            var sel = (t.truckId === selectedTruckId) ? " te-selected" : "";
+            return '<div class="table-row' + sel + '" data-id="' + t.truckId + '"' +
+                   ' onclick="onAvailRowClick(' + t.truckId + ', \'' + escJs(t.registrationNumber) + '\')">' +
+                   '<div class="te-row-check">' +
+                       '<input type="radio" name="truckSel" ' + (t.truckId === selectedTruckId ? 'checked' : '') + ' />' +
+                       '<div class="te-radio-mark"></div>' +
+                   '</div>' +
+                   '<div>' + esc(t.registrationNumber) + '</div>' +
+                   '<div>' + esc(t.truckType)          + '</div>' +
+                   '<div class="te-center">' + escVal(t.truckKey) + '</div>' +
+                   '<div>' + esc(t.companyName)         + '</div>' +
+                   '<div class="te-center">' + escVal(t.noOfCompartments) + '</div>' +
+                   '<div class="' + (t.isPermanent ? 'te-status-y' : 'te-status-n') + '">' + (t.isPermanent ? '&#10004;' : '&mdash;') + '</div>' +
+                   '<div>' + fmtDec(t.printedTareWeight)  + '</div>' +
+                   '<div>' + fmtDec(t.printedGrossWeight) + '</div>' +
+                   '<div>' + fmtDec(t.tankerTareWeight)   + '</div>' +
+                   '<div>' + fmtDec(t.tankerGrossWeight)  + '</div>' +
+                   '<div>' + fmtDec(t.ccoePermWeight)     + '</div>' +
+                   '<div class="' + licClass(t.callibrationDueDate) + '">' + fmtDate(t.callibrationDueDate) + '</div>' +
+                   '<div class="' + licClass(t.licenseExpireDate) + '">' + fmtDate(t.licenseExpireDate)   + '</div>' +
+                   '<div class="' + licClass(t.explosiveExpiryDate) + '">' + fmtDate(t.explosiveExpiryDate) + '</div>' +
+                   '<div class="te-action-cell">&mdash;</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    /* ???????????????????????????????????????
+       RENDER — Today's Trucks
+    ??????????????????????????????????????? */
+    function renderTodayTrucks(list) {
+        var body  = document.getElementById("todayTruckBody");
+        var empty = document.getElementById("todayTruckEmpty");
+        if (!body) return;
+
+        if (!list || !list.length) {
+            body.innerHTML = "";
+            setEmpty("todayTruckEmpty", "No truck entries today.", true);
+            return;
+        }
+        if (empty) empty.style.display = "none";
+
+        body.innerHTML = list.map(function(t) {
+            var statusHtml = (t.tTStatus === "Y" || t.ttStatus === "Y")
+                ? '<span class="te-status-y">&#10004; Y</span>'
+                : '<span class="te-status-n">&mdash; N</span>';
+
+    var isSel = (t.truckEntryId === selectedEntryId) ? ' te-selected' : '';
+    return '<div class="table-row' + isSel + '" data-eid="' + t.truckEntryId + '" onclick="onTodayRowClick(' + t.truckEntryId + ')">' +
+                   '<div class="te-row-check"><div class="te-radio-mark"></div></div>' +
+                   '<div>' + esc(t.entryDate)          + '</div>' +
+                   '<div>' + esc(t.time)                + '</div>' +
+                   '<div>' + esc(t.entryType)          + '</div>' +
+                   '<div>' + esc(t.truckType)           + '</div>' +
+                   '<div>' + esc(t.truckNumber)         + '</div>' +
+                   '<div>' + esc(t.companyName)         + '</div>' +
+                   '<div class="te-center">' + escVal(t.noOfCompartments) + '</div>' +
+                   '<div class="te-center">' + escVal(t.truckKey) + '</div>' +
+                   '<div class="' + (t.isPermanentKey ? 'te-status-y' : 'te-status-n') + '">' + (t.isPermanentKey ? '&#10004;' : '&mdash;') + '</div>' +
+                   '<div>' + fmtDec(t.ccoePermWeight)   + '</div>' +
+                   '<div>' + fmtDec(t.tankerTareWeight) + '</div>' +
+                   '<div>' + fmtDec(t.tankerGrossWeight)+ '</div>' +
+                   '<div class="' + licClass(t.callibrationDueDate) + '">' + fmtDate(t.callibrationDueDate) + '</div>' +
+                   '<div class="' + licClass(t.licenseExpireDate) + '">' + fmtDate(t.licenseExpireDate) + '</div>' +
+                   '<div>' + statusHtml + '</div>' +
+                   '<div>' + escVal(t.sequenceNumber) + '</div>' +
+                   '<div>' + esc(t.response || t.licenseExpiryInfo) + '</div>' +
+                   '<div>' + esc(t.licenseExpiryInfo) + '</div>' +
+                   '</div>';
+        }).join("");
+    }
+
+    /* ???????????????????????????????????????
+       ROW SELECTION
+    ??????????????????????????????????????? */
+    function onAvailRowClick(id, regNum) {
+        if (selectedTruckId === id) {
+            // Deselect
+            selectedTruckId  = null;
+            selectedTruckNum = null;
+        } else {
+            selectedTruckId  = id;
+            selectedTruckNum = regNum;
+        }
+        renderAvailTrucks(getCurrentFilteredList());
+    }
+        function onTodayRowClick(id) {
+        selectedEntryId = (selectedEntryId === id) ? null : id;
+            renderTodayTrucks(todayTrucksList);
+    }
+
+    function getCurrentFilteredList() {
+        var q = document.getElementById("truckSearch").value.trim().toLowerCase();
+        if (!q) return availTrucksList;
+        return availTrucksList.filter(function(t) {
+            return t.registrationNumber && t.registrationNumber.toLowerCase().indexOf(q) !== -1;
+        });
+    }
+
+    /* ???????????????????????????????????????
+       SEARCH FILTER
+    ??????????????????????????????????????? */
+    function filterAvailableTable() {
+        renderAvailTrucks(getCurrentFilteredList());
+    }
+
+    /* ???????????????????????????????????????
+       ENTRY FLOW
+    ??????????????????????????????????????? */
+
+    // STEP 1: Entry button clicked
+    function onEntryClick() {
+        if (!selectedTruckId) {
+            openModal("noSelModal", "noSelBackdrop");
+            return;
+        }
+        // STEP 2: Show confirm modal
+        document.getElementById("confirmTruckNum").textContent = selectedTruckNum || selectedTruckId;
+        openModal("confirmModal", "confirmBackdrop");
+    }
+
+    // STEP 3: YES on confirm ? check SOD
+    function onConfirmYes() {
+        closeModal("confirmModal", "confirmBackdrop");
+
+        // STEP 4: SOD check
+        fetch("/Truck/CheckSOD")
+            .then(function(r) { return r.json(); })
+            .then(function(res) {
+                if (!res.sodStarted) {
+                    openModal("sodModal", "sodBackdrop");
+                    return;
+                }
+                // STEP 5: Open manual entry form
+                selectedReason = null;
+                document.getElementById("reasonSelectLabel").textContent = "Select Reason";
+                document.getElementById("reasonSelect").removeAttribute("data-val");
+    if (!entryReasonList || entryReasonList.length === 0) {
+        loadEntryReasons();
+        setTimeout(() => {
+            openModal("manualModal", "manualBackdrop");
+        }, 200);
+        return;
+    }
+
+    openModal("manualModal", "manualBackdrop");
+                    openModal("manualModal", "manualBackdrop");
+            })
+            .catch(function() {
+                showError("Failed to check TAS Day status. Please try again.");
+            });
+    }
+
+    // STEP 6: POST
+    function onPostEntry() {
+        var reason = document.getElementById("reasonSelect").getAttribute("data-val");
+        if (!reason) {
+            showError("Please select a reason before posting.");
+            return;
+        }
+
+        var btn   = document.getElementById("btnPost");
+        var label = document.getElementById("btnPostLabel");
+        btn.disabled    = true;
+        label.textContent = "Posting...";
+
+        fetch("/Truck/PostManualEntry", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ truckId: selectedTruckId, reason: reason })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+            btn.disabled      = false;
+            label.textContent = "POST";
+
+            if (res.success) {
+                closeModal("manualModal", "manualBackdrop");
+                selectedTruckId  = null;
+                selectedTruckNum = null;
+                selectedReason   = null;
+                // Refresh both tables
+                loadAvailableTrucks();
+                loadTodayTrucks();
+            } else if (res.message === "NO_SOD") {
+                closeModal("manualModal", "manualBackdrop");
+                openModal("sodModal", "sodBackdrop");
+            } else {
+                showError(res.message || "Entry failed. Please try again.");
+            }
+        })
+        .catch(function() {
+            btn.disabled      = false;
+            label.textContent = "POST";
+            showError("Network error. Please check your connection.");
+        });
+    }
+
+    // SAP Posting — placeholder
+    function onSapPosting() {
+        showError("SAP Posting functionality is not yet implemented.");
+    }
+
+    /* ???????????????????????????????????????
+       REASON DROPDOWN WIRING
+    ??????????????????????????????????????? */
+function wireReasonDropdown() {
+    document.addEventListener("click", function(e) {
+        var trigger = e.target.closest("#reasonSelect .select-trigger");
+        if (trigger) {
+            e.stopPropagation();
+            var sel = document.getElementById("reasonSelect");
+            var isOpen = sel.classList.contains("open");
+            document.querySelectorAll(".te-modal-select.open").forEach(function(s) {
+                s.classList.remove("open");
+            });
+            if (!isOpen) sel.classList.add("open");
+            return;
+        }
+        if (!e.target.closest("#reasonSelect")) {
+            var openSel = document.getElementById("reasonSelect");
+            if (openSel) openSel.classList.remove("open");
+        }
+    });
+
+    document.addEventListener("mousedown", function(e) {
+        var opt = e.target.closest("#reasonDropdown .option");
+        if (!opt) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (opt.getAttribute("data-disabled") === "1") return;
+        var sel = document.getElementById("reasonSelect");
+        document.getElementById("reasonSelectLabel").textContent = opt.getAttribute("data-val");
+        sel.setAttribute("data-val", opt.getAttribute("data-val"));
+        sel.classList.remove("open");
+    });
+}
+
+
+    function renderReasonDropdown(isLoading) {
+        var dropdown = document.getElementById("reasonDropdown");
+        if (!dropdown) return;
+
+        if (isLoading) {
+            dropdown.innerHTML = '<div class="option" data-disabled="1" data-val="">Loading...</div>';
+            return;
+        }
+
+        if (!entryReasonList.length) {
+            dropdown.innerHTML = '<div class="option" data-disabled="1" data-val="">No reasons found</div>';
+            return;
+        }
+
+        dropdown.innerHTML = entryReasonList.map(function(r) {
+            return '<div class="option" data-val="' + escAttr(r.reasonDescription) + '">' +
+                esc(r.reasonDescription) +
+                '</div>';
+        }).join("");
+    }
+
+
+        /* ???????????????????????????????????????
+       MODAL HELPERS
+    ??????????????????????????????????????? */
+    function openModal(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = document.getElementById(backdropId);
+        if (!m || !b) return;
+        m.style.display = "block";
+        b.style.display = "block";
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                m.classList.add("show");
+                b.classList.add("show");
+            });
+        });
+    }
+
+    function closeModal(modalId, backdropId) {
+        var m = document.getElementById(modalId);
+        var b = document.getElementById(backdropId);
+        if (!m || !b) return;
+        m.classList.remove("show");
+        b.classList.remove("show");
+        setTimeout(function() {
+            m.style.display = "none";
+            b.style.display = "none";
+        }, 220);
+    }
+
+    function showError(msg) {
+        document.getElementById("errModalText").textContent = msg;
+        openModal("errModal", "errBackdrop");
+    }
+
+    /* ???????????????????????????????????????
+       HELPERS — formatting
+    ??????????????????????????????????????? */
+    function fmtDec(v) {
+        if (v == null) return "<span style='color:rgba(255,255,255,0.18)'>&mdash;</span>";
+        return parseFloat(v).toFixed(2);
+    }
+
+    function fmtDate(v) {
+        if (!v) return "<span style='color:rgba(255,255,255,0.18)'>&mdash;</span>";
+        var d = new Date(v);
+        if (isNaN(d)) return v;
+        var dd = ("0" + d.getDate()).slice(-2);
+        var mm = ("0" + (d.getMonth() + 1)).slice(-2);
+        var yy = d.getFullYear();
+        return dd + "/" + mm + "/" + yy;
+    }
+
+    function licClass(v) {
+        if (!v) return "";
+        var d    = new Date(v);
+        var now  = new Date();
+        var diff = (d - now) / (1000 * 60 * 60 * 24);   // days
+        if (diff < 0)   return "te-lic-exp";
+        if (diff < 30)  return "te-lic-warn";
+        return "te-lic-ok";
+    }
+
+    function setEmpty(id, msg, show) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.textContent  = msg;
+        el.style.display = show ? "block" : "none";
+    }
+
+    function esc(s) {
+        if (s == null) return "";
+        return String(s)
+            .replace(/&/g,  "&amp;")
+            .replace(/</g,  "&lt;")
+            .replace(/>/g,  "&gt;")
+            .replace(/"/g,  "&quot;");
+    }
+
+    function escJs(s) {
+        if (s == null) return "";
+        return String(s).replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    }
+
+    function escVal(v) {
+        if (v == null || v === "") return "&mdash;";
+        return esc(v);
+    }
+
+    function escAttr(s) {
+        if (s == null) return "";
+        return String(s)
+            .replace(/&/g, "&amp;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#39;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+    }
+
+</script>
+

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+
+  sql2022:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql2022
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Admin123#"
+    ports:
+      - "14330:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  newtasui:
+    build: .
+    container_name: newtasui
+    ports:
+      - "8082:8080"
+    depends_on:
+      - sql2022
+
+volumes:
+  sql_data:
