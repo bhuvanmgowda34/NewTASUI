@@ -1,3 +1,42 @@
+# name: Build ASP.NET Core
+
+# on:
+  # push:
+    # branches:
+      # - main
+
+# jobs:
+  # build:
+
+    # runs-on: ubuntu-latest
+
+    # steps:
+
+    # - name: Checkout Repository
+      # uses: actions/checkout@v4
+
+    # - name: Setup .NET
+      # uses: actions/setup-dotnet@v4
+      # with:
+        # dotnet-version: '8.0.x'
+
+    # - name: Restore Packages
+      # run: dotnet restore
+
+    # - name: Build Project
+      # run: dotnet build --configuration Release --no-restore
+      
+      
+ # "Create a workflow called 'Build ASP.NET Core'. Whenever someone pushes code to the main branch, start a job named build. Run that job on GitHub's latest Ubuntu machine. First, download (checkout) my repository. Then install the .NET 8 SDK. Next, restore all NuGet packages. Finally, build the project in Release mode without restoring packages again."   
+
+# When code is pushed to main,
+# GitHub creates an Ubuntu VM,
+# downloads my project,
+# installs .NET 8,
+# restores packages,
+# builds the application,
+# and tells me whether the build succeeded or failed. 
+
 name: Build ASP.NET Core
 
 on:
@@ -25,3 +64,14 @@ jobs:
 
     - name: Build Project
       run: dotnet build --configuration Release --no-restore
+
+    - name: Publish Project
+      run: dotnet publish -c Release -o publish
+
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: NewTASUI
+        path: publish
+        
+# When someone pushes to the main branch, create an Ubuntu machine, download my repository, install .NET 8, restore packages, build the application, publish it into a folder called publish, upload that folder to GitHub as an artifact, and then delete the Ubuntu machine.        
