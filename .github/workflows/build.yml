@@ -37,6 +37,45 @@
 # builds the application,
 # and tells me whether the build succeeded or failed. 
 
+# name: Build ASP.NET Core
+
+# on:
+  # push:
+    # branches:
+      # - main
+
+# jobs:
+  # build:
+
+    # runs-on: ubuntu-latest
+
+    # steps:
+
+    # - name: Checkout Repository
+      # uses: actions/checkout@v4
+
+    # - name: Setup .NET
+      # uses: actions/setup-dotnet@v4
+      # with:
+        # dotnet-version: '8.0.x'
+
+    # - name: Restore Packages
+      # run: dotnet restore
+
+    # - name: Build Project
+      # run: dotnet build --configuration Release --no-restore
+
+    # - name: Publish Project
+      # run: dotnet publish -c Release -o publish
+
+    # - name: Upload Build Artifact
+      # uses: actions/upload-artifact@v4
+      # with:
+        # name: NewTASUI
+        # path: publish
+        
+# When someone pushes to the main branch, create an Ubuntu machine, download my repository, install .NET 8, restore packages, build the application, publish it into a folder called publish, upload that folder to GitHub as an artifact, and then delete the Ubuntu machine.        
+
 name: Build ASP.NET Core
 
 on:
@@ -74,4 +113,16 @@ jobs:
         name: NewTASUI
         path: publish
         
-# When someone pushes to the main branch, create an Ubuntu machine, download my repository, install .NET 8, restore packages, build the application, publish it into a folder called publish, upload that folder to GitHub as an artifact, and then delete the Ubuntu machine.        
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_TOKEN }}
+
+    - name: Build Docker Image
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/newtasui:latest .
+
+    - name: Push Docker Image
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/newtasui:latest
+      
+      # Whenever someone pushes to the main branch, GitHub creates a temporary Ubuntu virtual machine, downloads my repository, installs the .NET SDK, restores all NuGet packages, builds the application, publishes it, uploads the published files as an artifact, logs into Docker Hub using encrypted credentials, builds a Docker image from my Dockerfile, pushes that image to Docker Hub, and finally deletes the temporary runner.
