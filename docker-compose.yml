@@ -14,12 +14,15 @@ services:
       - sql_data:/var/opt/mssql
 
   newtasui:
-    build: .
+    image: bhuonemain/newtasui:latest
     container_name: newtasui
     ports:
       - "8082:8080"
     depends_on:
       - sql2022
+      
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sql2022;Database=TAS_Nagraj;User ID=tasuser;Password=Admin123#;Encrypt=False;TrustServerCertificate=True;" 
 
 volumes:
   sql_data:
