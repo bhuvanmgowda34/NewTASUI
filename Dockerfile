@@ -4,7 +4,7 @@ WORKDIR /src
 
 COPY . .
 
-RUN dotnet publish -c release -o /app/publish 
+RUN dotnet publish NewTASUI.csproj -c release -o /app/publish 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 
