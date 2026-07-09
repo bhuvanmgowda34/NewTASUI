@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+
+  sql2022:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql2022
+
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Admin123#"
+
+    ports:
+      - "14330:1433"
+
+    volumes:
+      - sql_data:/var/opt/mssql
+
+    restart: unless-stopped
+
+  newtasui:
+    image: bhuonemain/newtasui:latest
+    container_name: newtasui
+
+    ports:
+      - "8080:8080"
+
+    depends_on:
+      - sql2022
+
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sql2022;Database=TAS_Nagraj;User ID=tasuser;Password=admin123#;Encrypt=False;TrustServerCertificate=True;"
+
+    restart: unless-stopped
+
+volumes:
+  sql_data:

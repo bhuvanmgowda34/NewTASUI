@@ -90,7 +90,7 @@ jobs:
 
     steps:
 
-    - name: Checkout Repository
+    - name: Checkout Repository      #Checkout downloads your repository.
       uses: actions/checkout@v4
 
     - name: Setup .NET
@@ -98,14 +98,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
 
-    - name: Restore Packages
+    - name: Restore Packages NewTASUI.csproj        #downloads NuGet Packages
       run: dotnet restore
 
-    - name: Build Project
-      run: dotnet build --configuration Release --no-restore
+    - name: Build Project             #Compiles your code. Produces DLLs.
+      run: dotnet build NewTASUI.csproj --configuration Release --no-restore
 
-    - name: Publish Project
-      run: dotnet publish -c Release -o publish
+    - name: Publish Project               #Create deployable application
+      run: dotnet publish NewTASUI.csproj -c Release -o publish
 
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
