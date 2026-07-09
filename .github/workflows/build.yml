@@ -99,7 +99,7 @@ jobs:
         dotnet-version: '8.0.x'
 
     - name: Restore Packages NewTASUI.csproj        #downloads NuGet Packages
-      run: dotnet restore
+      run: dotnet restore NewTASUI.csproj
 
     - name: Build Project             #Compiles your code. Produces DLLs.
       run: dotnet build NewTASUI.csproj --configuration Release --no-restore
