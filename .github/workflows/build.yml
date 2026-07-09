@@ -125,36 +125,36 @@ jobs:
     - name: Push Docker Image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/newtasui:latest
     
-    - name: Test SSH Connection to Azure
-      uses: appleboy/ssh-action@v1.2.0
-      with:
-        host: ${{ secrets.AZURE_HOST }}
-        username: ${{ secrets.AZURE_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          echo "Connected Successfully"
-          hostname
-          pwd
-          whoami    
-      
-    # - name: Copy Production Compose File
-      # uses: appleboy/scp-action@v0.1.7
-      # with:
-        # host: ${{ secrets.AZURE_HOST }}
-        # username: ${{ secrets.AZURE_USER }}
-        # key: ${{ secrets.SSH_PRIVATE_KEY }} 
-        # source: "docker-compose.prod.yml"
-        # target: "/home/azureuser/"      
-      
-    # - name: Deploy to Azure VM
+    # - name: Test SSH Connection to Azure
       # uses: appleboy/ssh-action@v1.2.0
       # with:
         # host: ${{ secrets.AZURE_HOST }}
         # username: ${{ secrets.AZURE_USER }}
         # key: ${{ secrets.SSH_PRIVATE_KEY }}
         # script: |
-          # cd /home/azureuser
-          # docker compose -f docker-compose.prod.yml pull
-          # docker compose -f docker-compose.prod.yml up -d      
+          # echo "Connected Successfully"
+          # hostname
+          # pwd
+          # whoami    
+      
+    - name: Copy Production Compose File
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.AZURE_HOST }}
+        username: ${{ secrets.AZURE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }} 
+        source: "docker-compose.prod.yml"
+        target: "/home/azureuser/"      
+      
+    - name: Deploy to Azure VM
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.AZURE_HOST }}
+        username: ${{ secrets.AZURE_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /home/azureuser
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d      
       
       # Whenever someone pushes to the main branch, GitHub creates a temporary Ubuntu virtual machine, downloads my repository, installs the .NET SDK, restores all NuGet packages, builds the application, publishes it, uploads the published files as an artifact, logs into Docker Hub using encrypted credentials, builds a Docker image from my Dockerfile, pushes that image to Docker Hub, and finally deletes the temporary runner.
