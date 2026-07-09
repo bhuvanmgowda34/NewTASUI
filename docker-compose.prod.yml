@@ -28,9 +28,6 @@ services:
     depends_on:
       - sql2022
 
-    environment:
-      ConnectionStrings__DefaultConnection: "Server=sql2022;Database=TAS_Nagraj;User ID=tasuser;Password=admin123#;Encrypt=False;TrustServerCertificate=True;"
-
     restart: unless-stopped
 
 volumes:
