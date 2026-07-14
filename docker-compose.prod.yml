@@ -45,16 +45,17 @@ services:
 
     restart: unless-stopped      
       
-    certbot:
-      image: certbot/certbot
-      container_name: certbot
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
 
-      volumes:
-        - ./certbot/www:/var/www/certbot
-        - ./certbot/conf:/etc/letsencrypt
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
 
-      profiles:
-        - certbot  
+    profiles:
+      - certbot  
+
 
 volumes:
   sql_data:
