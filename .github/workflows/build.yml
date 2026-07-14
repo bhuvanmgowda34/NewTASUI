@@ -136,7 +136,14 @@ jobs:
           # hostname
           # pwd
           # whoami    
-      
+    - name: Verify Repository Files
+      run: |
+        pwd
+        echo "=========================="
+        ls -la
+        echo "=========================="
+        find . -maxdepth 3
+ 
     - name: Copy Production Compose File
       uses: appleboy/scp-action@v0.1.7
       with:
@@ -144,8 +151,8 @@ jobs:
         username: ${{ secrets.AZURE_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }} 
         source: |
-            docker-compose.prod.yml
-            nginx/**      
+          docker-compose.prod.yml
+          nginx      
       
     - name: Deploy Latest Image to Azure VM
       uses: appleboy/ssh-action@v1.2.0
