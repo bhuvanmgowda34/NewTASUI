@@ -59,3 +59,5 @@ services:
 
 volumes:
   sql_data:
+    external: true
+    name: azureuser_sql_data
