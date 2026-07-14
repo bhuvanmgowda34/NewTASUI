@@ -136,13 +136,13 @@ jobs:
           # hostname
           # pwd
           # whoami    
-    - name: Verify Repository Files
-      run: |
-        pwd
-        echo "=========================="
-        ls -la
-        echo "=========================="
-        find . -maxdepth 3
+    # - name: Verify Repository Files
+      # run: |
+        # pwd
+        # echo "=========================="
+        # ls -la
+        # echo "=========================="
+        # find . -maxdepth 3
  
     - name: Copy Production Compose File
       uses: appleboy/scp-action@v0.1.7
