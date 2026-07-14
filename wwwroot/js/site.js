@@ -361,36 +361,69 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-        fetch('/Reports/GetBays')
-            .then(res => res.json())
-            .then(data => {
+        //fetch('/Reports/GetBays')
+        //    .then(res => res.json())
+        //    .then(data => {
 
-                const dropdown = document.getElementById("bayDropdown");
+        //        const dropdown = document.getElementById("bayDropdown");
 
-                let html = `<div class="option">All Bays</div>`;
+        //        let html = `<div class="option">All Bays</div>`;
 
-                data.forEach(bay => {
-                    html += `<div class="option" data-id="${bay.id}">${bay.name}</div>`;
-                });
+        //        data.forEach(bay => {
+        //            html += `<div class="option" data-id="${bay.id}">${bay.name}</div>`;
+        //        });
 
-                dropdown.innerHTML = html;
+        //        dropdown.innerHTML = html;
 
-                //  ADD THIS PART (IMPORTANT)
-                dropdown.querySelectorAll(".option").forEach(option => {
-                    option.addEventListener("click", function (e) {
+        //        //  ADD THIS PART (IMPORTANT)
+        //        dropdown.querySelectorAll(".option").forEach(option => {
+        //            option.addEventListener("click", function (e) {
 
-                        e.stopPropagation();
+        //                e.stopPropagation();
 
-                        document.querySelector("#baySelect .select-trigger span").textContent = this.textContent;
+        //                document.querySelector("#baySelect .select-trigger span").textContent = this.textContent;
 
-                        // STORE SELECTED BAY ID
-                        document.getElementById("baySelect").setAttribute("data-selected-id", this.dataset.id);
+        //                // STORE SELECTED BAY ID
+        //                document.getElementById("baySelect").setAttribute("data-selected-id", this.dataset.id);
 
-                        document.getElementById("baySelect").classList.remove("open");
-                    });
-                });
+        //                document.getElementById("baySelect").classList.remove("open");
+        //            });
+        //        });
 
+        //    });
+document.addEventListener("DOMContentLoaded", () => {
+
+    const dropdown = document.getElementById("bayDropdown");
+    if (!dropdown) return;
+
+    fetch('/Reports/GetBays')
+        .then(res => res.json())
+        .then(data => {
+
+            let html = `<div class="option">All Bays</div>`;
+
+            data.forEach(bay => {
+                html += `<div class="option" data-id="${bay.id}">${bay.name}</div>`;
             });
+
+            dropdown.innerHTML = html;
+
+            dropdown.querySelectorAll(".option").forEach(option => {
+                option.addEventListener("click", function (e) {
+
+                    e.stopPropagation();
+
+                    document.querySelector("#baySelect .select-trigger span").textContent = this.textContent;
+
+                    document.getElementById("baySelect").setAttribute("data-selected-id", this.dataset.id);
+
+                    document.getElementById("baySelect").classList.remove("open");
+                });
+            });
+
+        });
+
+});
 // LICENSE API
 
 document.addEventListener('DOMContentLoaded', () => {
