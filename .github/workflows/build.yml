@@ -149,10 +149,9 @@ jobs:
       with:
         host: ${{ secrets.AZURE_HOST }}
         username: ${{ secrets.AZURE_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }} 
-        source: |
-          docker-compose.prod.yml
-          nginx      
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "docker-compose.prod.yml,nginx"
+        target: "/home/azureuser/"    
       
     - name: Deploy Latest Image to Azure VM
       uses: appleboy/ssh-action@v1.2.0
