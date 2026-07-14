@@ -22,11 +22,26 @@ services:
     image: bhuonemain/newtasui:latest
     container_name: newtasui
 
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
 
     depends_on:
       - sql2022
+
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+
+    depends_on:
+      - newtasui
 
     restart: unless-stopped
 
