@@ -151,7 +151,7 @@ jobs:
         username: ${{ secrets.AZURE_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         source: "docker-compose.prod.yml,nginx"
-        target: "/home/azureuser/"    
+        target: "/home/azureuser/newtasui/"    
       
     - name: Deploy Latest Image to Azure VM
       uses: appleboy/ssh-action@v1.2.0
@@ -160,7 +160,7 @@ jobs:
         username: ${{ secrets.AZURE_USER }}
         key: ${{ secrets.SSH_PRIVATE_KEY }}
         script: |
-          cd /home/azureuser
+          cd /home/azureuser/newtasui
           docker compose -f docker-compose.prod.yml pull
           docker compose -f docker-compose.prod.yml up -d --remove-orphans     
       
